@@ -6,6 +6,8 @@ functionality within the main workspace. -->
     <property_list>
         <!-- RESOURCE FILES AND FOLDERS -->
         <property name="DATA_RESOURCE_PATH" value="data"/>
+        <property name="GUI_RESOURCE_PATH" value="gui"/>
+        <property name="ICONS_RESOURCE_PATH" value="icons"/>
 
         <!-- USER INTERFACE ICON FILES -->
         <property name="SCREENSHOT_ICON" value="screenshot.png"/>
@@ -21,16 +23,25 @@ functionality within the main workspace. -->
         <property name="RESOURCE_SUBDIR_NOT_FOUND" value="Directory not found under resources."/>
 
         <!-- APPLICATION-SPECIFIC MESSAGE TITLES -->
+        <property name="ERROR_TITLE" value="Error!"/>
         <property name="SAVE_UNSAVED_WORK_TITLE" value="Save Current Work"/>
 
         <!-- APPLICATION-SPECIFIC MESSAGES -->
+        <property name="ERROR_DATA" value="The data you want to display is incorrect" />
         <property name="SAVE_UNSAVED_WORK" value="Would you like to save current work?"/>
 
         <!-- APPLICATION-SPECIFIC PARAMETERS -->
         <property name="DATA_FILE_EXT" value=".tsd"/>
         <property name="DATA_FILE_EXT_DESC" value="Tab-Separated Data File"/>
-        <property name="TEXT_AREA" value="text area"/>
+        <property name="TEXT_AREA" value="Data File"/>
         <property name="SPECIFIED_FILE" value=" specified file"/>
+
+        <!-- BUTTONS -->
+        <property name="DISPLAY" value="Display"/>
+
+        <!-- TITLES -->
+        <property name="CHART_TITLE" value="Data Visualization"/>
+        <property name="TEXT_TITLE" value="Data File"/>
 
     </property_list>
     <property_options_list/>
