@@ -1,0 +1,71 @@
+/* Visualization Library in Java (ViLiJ) */
+.axis {
+    -fx-font-size: 1.4em;
+    -fx-tick-label-fill: #914800;
+    -fx-font-family: Tahoma;
+    -fx-tick-length: 20;
+    -fx-minor-tick-length: 10;
+}
+
+.axis-label {
+   -fx-text-fill: transparent;
+}
+
+.axis-tick-mark {
+    -fx-stroke: #637040;
+    -fx-stroke-width: 3;
+}
+.axis-minor-tick-mark {
+    -fx-stroke: #859656;
+}
+
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+.chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+.chart-horizontal-grid-lines {
+    -fx-stroke: transparent;
+}
+
+.chart-legend {
+   -fx-background-color:  transparent;
+   -fx-padding: 20px;
+}
+
+.chart-legend-item-symbol{
+   -fx-background-color: transparent, transparent;
+   -fx-background-radius: 0;
+}
+
+.chart-legend-item{
+    -fx-text-fill: transparent;
+}
+.chart-symbol {
+    -fx-background-color-fill: transparent;
+    -fx-background-insets: 0, 0;
+    -fx-background-radius: 0px;
+    -fx-padding: 0px;
+}
+.default-color0.chart-series-line {
+-fx-stroke: blue;
+}
+.default-color0.chart-line-symbol {
+    -fx-background-color: blue, blue;
+}
+
+.default-color1.chart-series-line {
+-fx-stroke: blue;
+}
+
+.default-color1.chart-line-symbol {
+    -fx-background-color: blue, blue;
+}
+.default-color1.chart-series-line {
+-fx-stroke: blue;
+}
+
+.default-color1.chart-line-symbol {
+    -fx-background-color: blue, blue;
+}
