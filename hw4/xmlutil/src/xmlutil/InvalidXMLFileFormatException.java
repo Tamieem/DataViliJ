@@ -1,5 +1,6 @@
 package xmlutil;
 
+
 /**
  * This is a checked exception that represents the event where an XML document cannot be validated against a provided
  * XML schema definition (which is a <code>.xsd</code> file).
@@ -24,7 +25,7 @@ public class InvalidXMLFileFormatException extends Exception {
     @Override
     public String toString() {
         return String.format("InvalidXMLFileFormatException {xmlFileName: '%s'; xsdFileName: '%s'} ",
-                             xmlFileName,
-                             xsdFileName);
+                xmlFileName,
+                xsdFileName);
     }
 }

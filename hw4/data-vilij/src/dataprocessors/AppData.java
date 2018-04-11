@@ -1,5 +1,6 @@
 package dataprocessors;
 
+
 import javafx.stage.Stage;
 import ui.AppUI;
 import vilij.components.DataComponent;

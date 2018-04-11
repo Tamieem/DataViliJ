@@ -1,5 +1,6 @@
 package algorithms;
 
+
 /**
  * This interface provides a way to run an algorithm
  * on a thread as a {@link java.lang.Runnable} object.

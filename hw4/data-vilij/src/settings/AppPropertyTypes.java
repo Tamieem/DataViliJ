@@ -1,5 +1,6 @@
 package settings;
 
+
 /**
  * This enumerable type lists the various application-specific property types listed in the initial set of properties to
  * be loaded from the workspace properties <code>xml</code> file specified by the initialization parameters.

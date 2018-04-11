@@ -136,7 +136,7 @@ public final class AppActions implements ActionComponent {
             infoLabel.append(savedFile);
         else
             infoLabel.append(applicationTemplate.manager.getPropertyValue(NO_FILE_FOUND.name()));
-            infoLabel.append(applicationTemplate.manager.getPropertyValue(LABEL_LIST.name()) + NEWLINE);
+        infoLabel.append(applicationTemplate.manager.getPropertyValue(LABEL_LIST.name()) + NEWLINE);
         for (String label:LabelProcessor.getLabels()) {
             String line = DASH+label+NEWLINE;
             infoLabel.append(line);
@@ -147,7 +147,7 @@ public final class AppActions implements ActionComponent {
     @Override
     public void handleLoadRequest(){
         // TODO: NOT A PART OF HW 1
-            AppUI app = (AppUI) applicationTemplate.getUIComponent();
+        AppUI app = (AppUI) applicationTemplate.getUIComponent();
         try {
             loadFile();
             app.getVB().getChildren().clear();
@@ -173,10 +173,10 @@ public final class AppActions implements ActionComponent {
         AppUI app= (AppUI) applicationTemplate.getUIComponent();
         Stage stage= app.getPrimaryWindow();
         if (app.getHasNewText()) {
-                if(promptToSave())
-                    stage.close();
-                else
-                    return;
+            if(promptToSave())
+                stage.close();
+            else
+                return;
         }
         else
             stage.close();
@@ -302,23 +302,23 @@ public final class AppActions implements ActionComponent {
      */
     private boolean promptToSave() {
         // TODO for homework 1
-       UITemplate template = (UITemplate) applicationTemplate.getUIComponent();
-       ConfirmationDialog saveDialogue= (ConfirmationDialog) applicationTemplate.getDialog(Dialog.DialogType.CONFIRMATION);
+        UITemplate template = (UITemplate) applicationTemplate.getUIComponent();
+        ConfirmationDialog saveDialogue= (ConfirmationDialog) applicationTemplate.getDialog(Dialog.DialogType.CONFIRMATION);
         saveDialogue.show(applicationTemplate.manager.getPropertyValue(SAVE_UNSAVED_WORK_TITLE.name()),
                 applicationTemplate.manager.getPropertyValue(SAVE_UNSAVED_WORK.name()));
-         if(saveDialogue.getSelectedOption() == ConfirmationDialog.Option.CANCEL) {
-             return false;
-         }
-         else if(saveDialogue.getSelectedOption()== ConfirmationDialog.Option.YES) {
-             try {
-                 savetoFile();
-             } catch (IOException e) {
-                 ErrorDialog errorDialogue= (ErrorDialog) applicationTemplate.getDialog(Dialog.DialogType.ERROR);
-                 errorDialogue.show(applicationTemplate.manager.getPropertyValue(ERROR_TITLE.name()),
-                         applicationTemplate.manager.getPropertyValue(RESOURCE_SUBDIR_NOT_FOUND.name()));
-             }
-         }
-         else;
-         return true;
+        if(saveDialogue.getSelectedOption() == ConfirmationDialog.Option.CANCEL) {
+            return false;
+        }
+        else if(saveDialogue.getSelectedOption()== ConfirmationDialog.Option.YES) {
+            try {
+                savetoFile();
+            } catch (IOException e) {
+                ErrorDialog errorDialogue= (ErrorDialog) applicationTemplate.getDialog(Dialog.DialogType.ERROR);
+                errorDialogue.show(applicationTemplate.manager.getPropertyValue(ERROR_TITLE.name()),
+                        applicationTemplate.manager.getPropertyValue(RESOURCE_SUBDIR_NOT_FOUND.name()));
+            }
+        }
+        else;
+        return true;
     }
 }

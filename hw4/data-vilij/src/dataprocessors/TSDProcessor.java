@@ -1,6 +1,7 @@
 package dataprocessors;
 
 
+
 import actions.AppActions;
 import com.sun.xml.internal.fastinfoset.util.StringArray;
 import javafx.geometry.Point2D;
@@ -22,6 +23,7 @@ import java.util.stream.Stream;
 import ui.AppUI;
 
 import static settings.AppPropertyTypes.*;
+import static settings.AppPropertyTypes.ERROR_TITLE;
 
 /**
  * The data files used by this data visualization applications follow a tab-separated format, where each data point is
@@ -89,30 +91,30 @@ public final class TSDProcessor {
         counter = 0;
         AtomicBoolean hadAnError   = new AtomicBoolean(false);
         Stream.of(tsdString.split("\n"))
-              .map(line -> Arrays.asList(line.split("\t")))
-              .forEach(list -> {
-                  try {
-                      counter++;
-                      String   name  = checkedname(list.get(0));
-                      String   label = checkedLabel(list.get(1));
-                      String[] pair  = list.get(2).split(",");
-                      Point2D  point = new Point2D(Double.parseDouble(pair[0]), Double.parseDouble(pair[1]));
-                      yComponent.add(point.getY());
-                      names.add(name);
-                      dataLabels.put(name, label);
-                      dataPoints.put(name, point);
-                  } catch (RepeatNameException e) {
-                      ErrorDialog errorDialogue = (ErrorDialog) applicationTemplate.getDialog(Dialog.DialogType.ERROR);
-                      String errorLine = new RepeatNameException(counter).toString();
-                      errorDialogue.show(applicationTemplate.manager.getPropertyValue(ERROR_TITLE.name()), errorLine);
-                      hadAnError.set(true);
-                  } catch (InvalidDataNameException e) {
-                      ErrorDialog errorDialogue = (ErrorDialog) applicationTemplate.getDialog(Dialog.DialogType.ERROR);
-                      String errorLine = new InvalidDataNameException(counter).toString();
-                      errorDialogue.show(applicationTemplate.manager.getPropertyValue(ERROR_TITLE.name()), errorLine);
-                      hadAnError.set(true);
-                  }
-              });
+                .map(line -> Arrays.asList(line.split("\t")))
+                .forEach(list -> {
+                    try {
+                        counter++;
+                        String   name  = checkedname(list.get(0));
+                        String   label = checkedLabel(list.get(1));
+                        String[] pair  = list.get(2).split(",");
+                        Point2D  point = new Point2D(Double.parseDouble(pair[0]), Double.parseDouble(pair[1]));
+                        yComponent.add(point.getY());
+                        names.add(name);
+                        dataLabels.put(name, label);
+                        dataPoints.put(name, point);
+                    } catch (RepeatNameException e) {
+                        ErrorDialog errorDialogue = (ErrorDialog) applicationTemplate.getDialog(Dialog.DialogType.ERROR);
+                        String errorLine = new RepeatNameException(counter).toString();
+                        errorDialogue.show(applicationTemplate.manager.getPropertyValue(ERROR_TITLE.name()), errorLine);
+                        hadAnError.set(true);
+                    } catch (InvalidDataNameException e) {
+                        ErrorDialog errorDialogue = (ErrorDialog) applicationTemplate.getDialog(Dialog.DialogType.ERROR);
+                        String errorLine = new InvalidDataNameException(counter).toString();
+                        errorDialogue.show(applicationTemplate.manager.getPropertyValue(ERROR_TITLE.name()), errorLine);
+                        hadAnError.set(true);
+                    }
+                });
 
 
     }

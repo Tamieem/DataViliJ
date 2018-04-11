@@ -1,5 +1,6 @@
 package ui;
 
+
 import actions.AppActions;
 import dataprocessors.AppData;
 import javafx.stage.Stage;

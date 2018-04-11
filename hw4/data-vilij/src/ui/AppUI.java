@@ -1,5 +1,6 @@
 package ui;
 
+
 import actions.AppActions;
 import dataprocessors.AppData;
 import dataprocessors.TSDProcessor;
@@ -26,9 +27,9 @@ import java.io.IOException;
 import static settings.AppPropertyTypes.*;
 import static settings.AppPropertyTypes.CSS_RESOURCE_FILENAME;
 import static settings.AppPropertyTypes.CSS_RESOURCE_PATH;
+import static vilij.settings.PropertyTypes.*;
 import static settings.AppPropertyTypes.GUI_RESOURCE_PATH;
 import static settings.AppPropertyTypes.ICONS_RESOURCE_PATH;
-import static vilij.settings.PropertyTypes.*;
 
 
 /**
