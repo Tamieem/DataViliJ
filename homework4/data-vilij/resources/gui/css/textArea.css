@@ -1,0 +1,6 @@
+/* Visualization Library in Java (ViLiJ) */
+
+.scroll-pane {
+    -fx-hbar-policy: never;
+    -fx-vbar-policy: never;
+}
