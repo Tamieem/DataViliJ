@@ -98,7 +98,7 @@ public final class AppActions implements ActionComponent {
         else
             app.getChoiceBox().setItems(FXCollections.observableArrayList("Select Algorithm Type",
                     "Clustering"));
-
+        app.setOptions(app.getChoiceBox().getItems());
         app.getChoiceBox().getSelectionModel().selectFirst();
         app.getVB().getChildren().add(app.getChoiceBox());
         //       app.setWorkspaceActions();

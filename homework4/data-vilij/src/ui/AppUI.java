@@ -67,6 +67,7 @@ public final class AppUI extends UITemplate {
 
     private Button configButton;
 
+    private List options;
     private ToggleGroup clusteringGroup = new ToggleGroup();
     private HBox clusteringHB = new HBox();
     private RadioButton rb2= new RadioButton("Random Clustering");
@@ -88,6 +89,10 @@ public final class AppUI extends UITemplate {
     public Label getLabel(){ return label; }
     public ChoiceBox getChoiceBox(){ return cb; }
     public boolean getHasNewText(){ return this.hasNewText; }
+
+
+    public List getOptions(){ return options; }
+    public void setOptions(List options){ this.options = options; }
 
 
 
@@ -207,12 +212,12 @@ public final class AppUI extends UITemplate {
 
         configButton = new Button("Configure");
         configButton.setOnAction(event -> handleRunConfiguration());
-        hB.getChildren().addAll(cb1, validateButton, configButton);
+        hB.getChildren().addAll(cb1, validateButton);
 
+
+        classifcationHB.getChildren().addAll(rb1, configButton);
         rb1.setToggleGroup(classificationGroup);
-        rb1.setSelected(true);
-        classifcationHB.getChildren().add(rb1);
-        classifcationHB.getChildren().add(configButton);
+        rb1.setSelected(true);;
 
 
         clusteringHB.getChildren().add(rb2);
@@ -255,21 +260,32 @@ public final class AppUI extends UITemplate {
 
 
 
-        final List options = cb.getItems();
+
 
         cb.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 if(((String)options.get(newValue.intValue())).equals("Classification")){
-                    if(((String)options.get(oldValue.intValue())).equals("Clustering"))
-                        savedConfig=false;
+                    if(((String)options.get(oldValue.intValue())).equals("Clustering")) {
+                        runConfig = new AlgorithmConfiguration((String) options.get(newValue.intValue()));
+                        savedConfig = false;
+                        vB.getChildren().remove(clusteringHB);
+                    }
+                    else if(((String)options.get(oldValue.intValue())).equals("Select Algorithm Type"))
+                        runConfig = new AlgorithmConfiguration((String)options.get(newValue.intValue()));
                     vB.getChildren().add(classifcationHB);
                     displayButton.setOnAction(e -> handleClassifcationDisplayRequest());
 
                 }
-                if(((String)options.get(newValue.intValue())).equals("Clustering")){
-                    if(((String)options.get(oldValue.intValue())).equals("Classification"))
-                        savedConfig=false;
+                else if(((String)options.get(newValue.intValue())).equals("Clustering")) {
+                    if (((String) options.get(oldValue.intValue())).equals("Classification")) {
+                        runConfig = new AlgorithmConfiguration((String) options.get(newValue.intValue()));
+                        savedConfig = false;
+                        vB.getChildren().remove(classifcationHB);
+                    }
+
+                    else if(((String)options.get(oldValue.intValue())).equals("Select Algorithm Type"))
+                        runConfig = new AlgorithmConfiguration((String)options.get(newValue.intValue()));
                     vB.getChildren().add(clusteringHB);
                     displayButton.setOnAction(e -> handleClusteringDisplayRequest());
                 }
