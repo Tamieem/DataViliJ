@@ -1,11 +1,12 @@
 package ui;
 
-
 import actions.AppActions;
+import algorithms.AlgorithmConfiguration;
 import dataprocessors.AppData;
 import dataprocessors.TSDProcessor;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.scene.Cursor;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -23,13 +24,14 @@ import vilij.templates.ApplicationTemplate;
 import vilij.templates.UITemplate;
 import vilij.components.Dialog;
 import java.io.IOException;
+import java.util.List;
 
 import static settings.AppPropertyTypes.*;
 import static settings.AppPropertyTypes.CSS_RESOURCE_FILENAME;
 import static settings.AppPropertyTypes.CSS_RESOURCE_PATH;
-import static vilij.settings.PropertyTypes.*;
 import static settings.AppPropertyTypes.GUI_RESOURCE_PATH;
 import static settings.AppPropertyTypes.ICONS_RESOURCE_PATH;
+import static vilij.settings.PropertyTypes.*;
 
 
 /**
@@ -41,6 +43,7 @@ public final class AppUI extends UITemplate {
 
     /** The application to which this class of actions belongs. */
     ApplicationTemplate applicationTemplate;
+    AlgorithmConfiguration runConfig = new AlgorithmConfiguration();
 
     @SuppressWarnings("FieldCanBeLocal")
     private static final String SEPARATOR= "/";
@@ -65,6 +68,16 @@ public final class AppUI extends UITemplate {
     private HBox hB= new HBox();
     // vB Holds Text Area and checkboxes and text information.
 
+    private Button configButton;
+
+    private ToggleGroup clusteringGroup = new ToggleGroup();
+    private HBox clusteringHB = new HBox();
+    private RadioButton rb2= new RadioButton("Random Clustering");
+
+
+    private ToggleGroup classificationGroup = new ToggleGroup();
+    private HBox classifcationHB = new HBox();
+    private RadioButton rb1 = new RadioButton("Random Classifcation");
 
     public void setLabel(Label label) { this.label = label; }
 
@@ -185,12 +198,29 @@ public final class AppUI extends UITemplate {
         displayButton = new Button(applicationTemplate.manager.getPropertyValue(DISPLAY.name()));
         vB.setPrefWidth(400);
         bp.setLeft(vB);
+
         cb1= new CheckBox(applicationTemplate.manager.getPropertyValue(READ_ONLY.name()));
-        displayButton.setOnAction(e -> handleDisplayRequest());
         validateButton = new Button(applicationTemplate.manager.getPropertyValue(VALIDATE.name()));
         validateButton.setDisable(true);
         validateButton.setOnAction(e -> ((AppActions) applicationTemplate.getActionComponent()).handleValidationRequest());
+
+        configButton = new Button("Configure");
+        configButton.setOnAction(event -> handleRunConfiguration());
         hB.getChildren().addAll(cb1, validateButton);
+        cb.setItems(FXCollections.observableArrayList("Select Algorithm Type",
+                "Clustering", "Classification"));
+
+
+        rb1.setToggleGroup(classificationGroup);
+        rb1.setSelected(true);
+        classifcationHB.getChildren().add(rb1);
+        classifcationHB.getChildren().add(configButton);
+
+
+        clusteringHB.getChildren().add(rb2);
+        clusteringHB.getChildren().add(configButton);
+        rb2.setToggleGroup(clusteringGroup);
+        rb2.setSelected(true);
     }
 
     public void setWorkspaceActions(){
@@ -224,12 +254,27 @@ public final class AppUI extends UITemplate {
         });
         chart.setCursor(Cursor.CROSSHAIR);
         textArea.setPrefRowCount(10);
+
+
+
+        final List options = cb.getItems();
         cb.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 
+                if(options.get(newValue.intValue()).equals("Classification")){
+                    vB.getChildren().add(classifcationHB);
+                    displayButton.setOnAction(e -> handleClassifcationDisplayRequest());
+
+                }
+                if(options.get(newValue.intValue()).equals("Clustering")){
+                    vB.getChildren().add(clusteringHB);
+                    displayButton.setOnAction(e -> handleClusteringDisplayRequest());
+                }
+
             }
         });
+
 
     }
 
@@ -251,6 +296,29 @@ public final class AppUI extends UITemplate {
                     applicationTemplate.manager.getPropertyValue(ERROR_DATA.name()));
         }
 
+    }
+
+    public void handleRunConfiguration(){
+        runConfig.run();
+        if(runConfig.getSelectedOption()==AlgorithmConfiguration.RunConfig.OK){
+            runConfig.setMaxIterations(Integer.parseInt(runConfig.getMaxIt().getText()));
+            runConfig.setUpdateInterval(Integer.parseInt(runConfig.getUpInt().getText()));
+            if(runConfig.getContRun().isSelected()){
+                runConfig.setToContinue(true);
+            } else { runConfig.setToContinue(false); }
+        }
+
+
+    }
+
+    public void handleClassifcationDisplayRequest(){
+        // TODO: hw5
+        //LineChart and shit
+    }
+
+    public void handleClusteringDisplayRequest(){
+        //TODO: hw5
+        //ScatterChart and shit
     }
     public void isSaved(boolean val){
         scrnshotButton.setDisable(val);
