@@ -1,5 +1,7 @@
 package algorithms;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,11 +14,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import vilij.templates.ApplicationTemplate;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class AlgorithmConfiguration extends Stage implements Algorithm{
+import static settings.AppPropertyTypes.*;
+
+public class AlgorithmConfiguration extends Stage{
 
     public enum RunConfig {
 
@@ -27,25 +32,26 @@ public class AlgorithmConfiguration extends Stage implements Algorithm{
 
         RunConfig(String option) { this.option = option; }
     }
+    ApplicationTemplate applicationTemplate;
 
     private int maxIterations;
     private int updateInterval;
     private int numberOfClusters;
     private boolean toContinue;
-    private TextArea upInt;
-    private TextArea maxIt;
-    private CheckBox contRun;
-    private TextArea numClusters;
+    private TextArea upInt = new TextArea();
+    private TextArea maxIt = new TextArea();
+    private CheckBox contRun = new CheckBox();
+    private TextArea numClusters = new TextArea();
 
 
     private RunConfig selectedOption;
     private String configuration;
 
-    public AlgorithmConfiguration(String configuration ) {
+    public AlgorithmConfiguration(ApplicationTemplate applicationTemplate, String configuration ) {
         this.configuration = configuration;
+        this.applicationTemplate=applicationTemplate;
     }
 
-    @Override
     public int getMaxIterations() {
         return maxIterations;
     }
@@ -53,15 +59,12 @@ public class AlgorithmConfiguration extends Stage implements Algorithm{
         this.maxIterations=maxIterations;
     }
 
-    @Override
     public int getUpdateInterval() {
         return updateInterval;
     }
     public void setUpdateInterval(int updateInterval){
         this.updateInterval=updateInterval;
     }
-
-    @Override
     public boolean tocontinue() {
         return toContinue;
     }
@@ -87,8 +90,9 @@ public class AlgorithmConfiguration extends Stage implements Algorithm{
     public TextArea getNumClusters() { return numClusters; }
 
     public void init(Stage owner) {
-        initModality(Modality.WINDOW_MODAL); // modal => messages are blocked from reaching other windows
-        initOwner(owner);
+
+        final Stage dialog = new Stage();
+
 
 
         List<Button> buttons = Arrays.asList(new Button(RunConfig.OK.name()),
@@ -108,35 +112,30 @@ public class AlgorithmConfiguration extends Stage implements Algorithm{
         HBox continuousRun = new HBox(5);
         HBox numOfClusters = new HBox(5);
 
-        Label maxIteration = new Label("Max. Iterations: " + "\t");
-        maxIt = new TextArea();
-        maxIt.setMinWidth(50);
-        maxIt.setPrefWidth(50);
-        maxIt.setMaxWidth(400);
+        if(maxIt.getText().matches("[a-z]"))
+            maxIt.setText("0");
+        if(numClusters.getText().matches("[a-z]"))
+            numClusters.setText("0");
+        if(upInt.getText().matches("[a-z]"))
+            upInt.setText("0");
+        Label maxIteration = new Label(applicationTemplate.manager.getPropertyValue(MAX_ITERATION.name()) + "\t");
+        maxIt.setMaxSize(10,10);
         maxIterations.getChildren().addAll(maxIteration, maxIt);
 
-        Label UpdateInterval = new Label(" Update Interval: " + "\t");
-        upInt = new TextArea();
-        upInt.setMinWidth(50);
-        upInt.setPrefWidth(50);
-        upInt.setMaxWidth(400);
+        Label UpdateInterval = new Label(applicationTemplate.manager.getPropertyValue(UPDATE_INTERVAL.name()) + "\t");
+        upInt.setMaxSize(10,10);
         updateInterval.getChildren().addAll(UpdateInterval, upInt);
 
-        Label ContinuousRun = new Label("Continuous Run? " + "\t");
-        contRun = new CheckBox();
+        Label ContinuousRun = new Label(applicationTemplate.manager.getPropertyValue(CONTINUOUS_RUN.name())+ "\t");
         continuousRun.getChildren().addAll(ContinuousRun, contRun);
 
-        Label NumberOfClusters = new Label("Number of Clusters: " + "\t");
-        numClusters = new TextArea();
-        numClusters = new TextArea();
-        numClusters.setMinWidth(50);
-        numClusters.setPrefWidth(50);
-        numClusters.setMaxWidth(400);
+        Label NumberOfClusters = new Label(applicationTemplate.manager.getPropertyValue(NUMBER_OF_CLUSTERS.name())+ " ");
+        numClusters.setMaxSize(10,10);
         numOfClusters.getChildren().addAll(NumberOfClusters, numClusters);
 
         VBox config = new VBox();
         config.getChildren().addAll(maxIterations, updateInterval, continuousRun);
-        if(configuration.equals("Clustering"))
+        if(configuration.equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name())))
             config.getChildren().addAll(numOfClusters);
 
         config.setAlignment(Pos.CENTER);
@@ -146,10 +145,62 @@ public class AlgorithmConfiguration extends Stage implements Algorithm{
         config.getChildren().add(buttonBox);
 
         this.setScene(new Scene(config));
+        this.showAndWait();
     }
 
-    @Override
-    public void run() {
-        showAndWait();
+    public void run(Stage owner) {
+        setWorkspaceActions();
+        init(owner);
+
+    }
+
+    private void setWorkspaceActions(){
+        if(maxIt.getText().matches(".*[a-zA-Z]+.*"))
+            maxIt.setText("0");
+        if(numClusters.getText().matches(".*[a-zA-Z]+.*"))
+            numClusters.setText("0");
+        if(upInt.getText().matches(".*[a-zA-Z]+.*"))
+            upInt.setText("0");
+        maxIt.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                try {
+                    maxIterations = Integer.parseInt(maxIt.getText());
+                } catch(NumberFormatException e){
+                    maxIterations=0;
+                }
+            }
+        });
+        upInt.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                try {
+                    updateInterval = Integer.parseInt(upInt.getText());
+                }catch (NumberFormatException e){
+                    updateInterval= 0;
+                }
+            }
+        });
+        numClusters.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                try {
+                    numberOfClusters = Integer.parseInt(numClusters.getText());
+                } catch(NumberFormatException e){
+                    numberOfClusters=0;
+                }
+            }
+        });
+
+        contRun.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            public void changed(ObservableValue<? extends Boolean> ov, Boolean old_val, Boolean new_val) {
+                if(contRun.isSelected()){
+                    toContinue=true;
+                }
+                else if(!contRun.isSelected())
+                    toContinue=false;
+            }
+        });
+
     }
 }

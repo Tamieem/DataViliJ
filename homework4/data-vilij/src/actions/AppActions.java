@@ -99,7 +99,7 @@ public final class AppActions implements ActionComponent {
             app.getChoiceBox().setItems(FXCollections.observableArrayList("Select Algorithm Type",
                     "Clustering"));
         app.setOptions(app.getChoiceBox().getItems());
-        app.getChoiceBox().getSelectionModel().selectFirst();
+     //   app.getChoiceBox().getSelectionModel().selectFirst();
         app.getVB().getChildren().add(app.getChoiceBox());
         //       app.setWorkspaceActions();
 
@@ -125,7 +125,7 @@ public final class AppActions implements ActionComponent {
                 LabelProcessor.getLabels().size() +
                 applicationTemplate.manager.getPropertyValue(LABEL_COUNT.name()) + NEWLINE);
         if(savedFile != null)
-            infoLabel.append(savedFile);
+            infoLabel.append(savedFile.getName());
         else
             infoLabel.append(applicationTemplate.manager.getPropertyValue(NO_FILE_FOUND.name()));
         infoLabel.append(applicationTemplate.manager.getPropertyValue(LABEL_LIST.name()) + NEWLINE);
@@ -209,10 +209,19 @@ public final class AppActions implements ActionComponent {
             try {
                 BufferedReader bufferedReader = new BufferedReader(new FileReader(savedFile));
                 String text;
-
+                int i=0;
+                String tenLines= "";
                 while ((text = bufferedReader.readLine()) != null) {
                     stringBuffer.append(text);
                     stringBuffer.append("\n");
+                    if(i<10){
+                        tenLines= new String(stringBuffer);
+                    }
+                    i++;
+                }
+                String[] lines= stringBuffer.toString().split("\n");
+                for(int j=10; j<lines.length; j++){
+                    
                 }
                 bufferedReader.close();
                 LabelProcessor.processString(stringBuffer.toString());

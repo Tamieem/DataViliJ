@@ -51,10 +51,27 @@ functionality within the main workspace. -->
         <!-- BUTTONS -->
         <property name="DISPLAY" value="Display"/>
         <property name="READ_ONLY" value="Done editing"/>
+        <property name="CONFIGURE"  value="Configure"/>
 
         <!-- TITLES -->
         <property name="CHART_TITLE" value="Data Visualization"/>
         <property name="TEXT_TITLE" value="Data File"/>
+
+
+        <!--CHOICE BOX AREA -->
+        <property name="CLASSIFICATION" value="Classification"/>
+        <property name="CLUSTERING" value="Clustering"/>
+        <property name="SELECT_ALGORITHM_TYPE" value="Select Algorithm Type"/>
+
+
+
+        <!-- ALGORITHM CONFIGURATION -->
+        <property name="MAX_ITERATION" value="Max. Iterations:" />
+        <property name="NUMBER_OF_CLUSTERS" value="Number of Clusters:"/>
+        <property name="CONTINUOUS_RUN" value="Continuous Run?"/>
+        <property name="UPDATE_INTERVAL" value="Update Interval:"/>
+        <property name="RUNTIME_CONFIGURATIONS" value="Runtime Configuration"/>
+
 
     </property_list>
     <property_options_list/>

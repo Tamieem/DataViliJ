@@ -49,7 +49,21 @@ public enum AppPropertyTypes {
     TEXT_AREA,
     SPECIFIED_FILE,
 
+    /* Choice Box Area */
+    CLASSIFICATION,
+    CLUSTERING,
+    SELECT_ALGORITHM_TYPE,
+
+    /*Algorithm Configuration */
+    MAX_ITERATION,
+    NUMBER_OF_CLUSTERS,
+    CONTINUOUS_RUN,
+    UPDATE_INTERVAL,
+    RUNTIME_CONFIGURATION,
+
     DISPLAY,
     READ_ONLY,
     CHART_TITLE,
+    CONFIGURE,
+
 }
