@@ -40,6 +40,7 @@ public final class AppActions implements ActionComponent {
     private Label dataLabel;
     private static final String NEWLINE= "\n";
     private static final String DASH = "-";
+    StringBuilder stringBuffer = new StringBuilder();
 
     public AppActions(ApplicationTemplate applicationTemplate) {
         this.applicationTemplate = applicationTemplate;
@@ -78,11 +79,11 @@ public final class AppActions implements ActionComponent {
             savedFile = null;
         }
     }
-    public void handleValidationRequest(){
+    public void handleValidationRequest(String string){
         AppUI app = (AppUI) applicationTemplate.getUIComponent();
         LabelProcessor = new TSDProcessor();
         try {
-            LabelProcessor.processString(app.getTextArea().getText());
+            LabelProcessor.processString(string);
         } catch (Exception e) {
             ErrorDialog errorDialogue= (ErrorDialog) applicationTemplate.getDialog(Dialog.DialogType.ERROR);
             errorDialogue.show(applicationTemplate.manager.getPropertyValue(ERROR_TITLE.name()),
@@ -142,15 +143,15 @@ public final class AppActions implements ActionComponent {
         AppUI app = (AppUI) applicationTemplate.getUIComponent();
         try {
             loadFile();
-            app.getVB().getChildren().clear();
-            app.getTextArea().setDisable(true);
-            app.getVB().getChildren().add(app.getTextArea());
-            handleValidationRequest();
-
         } catch (Exception e) {
             ErrorDialog errorDialogue= (ErrorDialog) applicationTemplate.getDialog(Dialog.DialogType.ERROR);
             errorDialogue.show(applicationTemplate.manager.getPropertyValue(ERROR_TITLE.name()),
                     applicationTemplate.manager.getPropertyValue(ERROR_DATA.name()));
+        }finally {
+            app.getVB().getChildren().clear();
+            app.getTextArea().setDisable(true);
+            app.getVB().getChildren().add(app.getTextArea());
+            handleValidationRequest(stringBuffer.toString());
         }
         app.isSaved(true);
 
@@ -204,10 +205,10 @@ public final class AppActions implements ActionComponent {
 
 
         if(savedFile!=null){
-            StringBuilder stringBuffer = new StringBuilder();
             StringBuilder sB2= new StringBuilder();
             try {
                 BufferedReader bufferedReader = new BufferedReader(new FileReader(savedFile));
+                stringBuffer= new StringBuilder();
                 String text;
                 int i=0;
                 String tenLines= "";
@@ -221,11 +222,11 @@ public final class AppActions implements ActionComponent {
                 }
                 String[] lines= stringBuffer.toString().split("\n");
                 for(int j=10; j<lines.length; j++){
-                    
+
                 }
                 bufferedReader.close();
                 LabelProcessor.processString(stringBuffer.toString());
-                app.setTextArea(stringBuffer.toString());
+                app.setTextArea(tenLines);
                 app.isSaved(false);
             } catch (FileNotFoundException e) {
                 ErrorDialog errorDialogue= (ErrorDialog) applicationTemplate.getDialog(Dialog.DialogType.ERROR);

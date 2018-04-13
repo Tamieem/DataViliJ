@@ -208,7 +208,7 @@ public final class AppUI extends UITemplate {
         cb1= new CheckBox(applicationTemplate.manager.getPropertyValue(READ_ONLY.name()));
         validateButton = new Button(applicationTemplate.manager.getPropertyValue(VALIDATE.name()));
         validateButton.setDisable(true);
-        validateButton.setOnAction(e -> ((AppActions) applicationTemplate.getActionComponent()).handleValidationRequest());
+        validateButton.setOnAction(e -> ((AppActions) applicationTemplate.getActionComponent()).handleValidationRequest(textArea.getText()));
 
         configButton = new Button(applicationTemplate.manager.getPropertyValue(CONFIGURE.name()));
         configButton.setOnAction(event -> handleRunConfiguration());
