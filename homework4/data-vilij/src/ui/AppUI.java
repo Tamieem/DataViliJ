@@ -65,7 +65,8 @@ public final class AppUI extends UITemplate {
     private HBox hB= new HBox();
     // vB Holds Text Area and checkboxes and text information.
 
-    private Button configButton;
+    private Button configButton1;
+    private Button configButton2;
 
     private List options;
     private ToggleGroup clusteringGroup = new ToggleGroup();
@@ -209,19 +210,22 @@ public final class AppUI extends UITemplate {
         validateButton = new Button(applicationTemplate.manager.getPropertyValue(VALIDATE.name()));
         validateButton.setDisable(true);
         validateButton.setOnAction(e -> ((AppActions) applicationTemplate.getActionComponent()).handleValidationRequest(textArea.getText()));
-
-        configButton = new Button(applicationTemplate.manager.getPropertyValue(CONFIGURE.name()));
-        configButton.setOnAction(event -> handleRunConfiguration());
         hB.getChildren().addAll(cb1, validateButton);
 
+        configButton1 = new Button(applicationTemplate.manager.getPropertyValue(CONFIGURE.name()));
+        configButton1.setOnAction(event -> handleRunConfiguration());
 
-        classifcationHB.getChildren().addAll(rb1, configButton);
+
+        configButton2 = new Button(applicationTemplate.manager.getPropertyValue(CONFIGURE.name()));
+        configButton2.setOnAction(event -> handleRunConfiguration());
+        classifcationHB.getChildren().addAll(rb1, configButton1);
         rb1.setToggleGroup(classificationGroup);
-        rb1.setSelected(true);;
+        rb1.setSelected(true);
+        displayButton.setDisable(true);
 
 
         clusteringHB.getChildren().add(rb2);
-        clusteringHB.getChildren().add(configButton);
+        clusteringHB.getChildren().add(configButton2);
         rb2.setToggleGroup(clusteringGroup);
         rb2.setSelected(true);
     }
@@ -233,12 +237,10 @@ public final class AppUI extends UITemplate {
                 newButton.setDisable(false);
                 saveButton.setDisable(false);
                 hasNewText= true;
-                displayButton.setDisable(false);
                 String data= textArea.getText();
                 if(data.isEmpty()){
                     newButton.setDisable(true);
                     saveButton.setDisable(true);
-                    displayButton.setDisable(true);
                     hasNewText= false;
                 }
             }
@@ -265,40 +267,45 @@ public final class AppUI extends UITemplate {
         cb.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if(newValue.intValue()==-1);
+                try {
+                    if (newValue.intValue() == -1) ;
 
-                if(((String)options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLASSIFICATION.name())))
-                    vB.getChildren().remove(classifcationHB);
-                else if(((String)options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name())))
-                    vB.getChildren().remove(clusteringHB);
+                    if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLASSIFICATION.name())))
+                        vB.getChildren().removeAll(classifcationHB,displayButton);
+                    else if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name())))
+                        vB.getChildren().removeAll(clusteringHB, displayButton);
 
-                if(((String)options.get(newValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLASSIFICATION.name()))){
-                    if(((String)options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name()))) {
-                        runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
-                        savedConfig = false;
+                    if (((String) options.get(newValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLASSIFICATION.name()))) {
+                        if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name()))) {
+                            runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
+                            savedConfig = false;
+                        } else if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(SELECT_ALGORITHM_TYPE.name())))
+                            runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
+                        vB.getChildren().add(classifcationHB);
+                        vB.getChildren().add(displayButton);
+                        displayButton.setOnAction(e -> handleClassifcationDisplayRequest());
+
+                    } else if (((String) options.get(newValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name()))) {
+                        if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLASSIFICATION.name()))) {
+                            runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
+                            savedConfig = false;
+                        } else if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(SELECT_ALGORITHM_TYPE.name())))
+                            runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
+                        vB.getChildren().add(clusteringHB);
+                        vB.getChildren().add(displayButton);
+                        displayButton.setOnAction(e -> handleClusteringDisplayRequest());
                     }
-                    else if(((String)options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(SELECT_ALGORITHM_TYPE.name())))
-                        runConfig = new AlgorithmConfiguration(applicationTemplate, (String)options.get(newValue.intValue()));
-                    vB.getChildren().add(classifcationHB);
-                    displayButton.setOnAction(e -> handleClassifcationDisplayRequest());
-
-                }
-                else if(((String)options.get(newValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name()))) {
-                    if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLASSIFICATION.name()))) {
-                        runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
-                        savedConfig = false;
+                    else if (((String) options.get(newValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(SELECT_ALGORITHM_TYPE.name()))) {
+                        if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLASSIFICATION.name()))) {
+                            vB.getChildren().remove(classifcationHB);
+                            savedConfig = false;
+                        } else if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name())))
+                            vB.getChildren().remove(clusteringHB);
+                        vB.getChildren().remove(displayButton);
                     }
-
-                    else if(((String)options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(SELECT_ALGORITHM_TYPE.name())))
-                        runConfig = new AlgorithmConfiguration(applicationTemplate, (String)options.get(newValue.intValue()));
-                    vB.getChildren().add(clusteringHB);
-                    displayButton.setOnAction(e -> handleClusteringDisplayRequest());
-                }
+                } catch(IndexOutOfBoundsException e){}
             }
         });
-        if(savedConfig){
-            displayButton.setDisable(false);
-        }
 
     }
 
@@ -325,7 +332,14 @@ public final class AppUI extends UITemplate {
     public void handleRunConfiguration() {
         runConfig.run(getPrimaryWindow());
         if (runConfig.getSelectedOption() == AlgorithmConfiguration.RunConfig.OK) {
-            savedConfig = true;
+            if(runConfig.getMaxIterations()>0 && runConfig.getNumberOfClusters()>-1 && runConfig.getUpdateInterval()>-1) {
+                savedConfig = true;
+                displayButton.setDisable(false);
+            }
+            else{
+                savedConfig=false;
+                displayButton.setDisable(true);
+            }
         }
     }
 
