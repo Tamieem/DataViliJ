@@ -219,6 +219,7 @@ public final class AppUI extends UITemplate {
         configButton2 = new Button(applicationTemplate.manager.getPropertyValue(CONFIGURE.name()));
         configButton2.setOnAction(event -> handleRunConfiguration());
         classifcationHB.getChildren().addAll(rb1, configButton1);
+
         rb1.setToggleGroup(classificationGroup);
         rb1.setSelected(true);
         displayButton.setDisable(true);
@@ -287,7 +288,7 @@ public final class AppUI extends UITemplate {
 
                     } else if (((String) options.get(newValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name()))) {
                         if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLASSIFICATION.name()))) {
-                            runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
+                           // runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
                             savedConfig = false;
                         } else if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(SELECT_ALGORITHM_TYPE.name())))
                             runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
