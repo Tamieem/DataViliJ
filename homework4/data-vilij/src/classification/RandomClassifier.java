@@ -3,7 +3,9 @@ package classification;
 import algorithms.Classifier;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -20,6 +22,7 @@ public class RandomClassifier extends Classifier {
 
     private final int maxIterations;
     private final int updateInterval;
+    private List<List<Integer>> outputs = new ArrayList<List<Integer>>();
 
     // currently, this value does not change after instantiation
     private final AtomicBoolean tocontinue;
@@ -38,6 +41,8 @@ public class RandomClassifier extends Classifier {
     public boolean tocontinue() {
         return tocontinue.get();
     }
+
+    public List<List<Integer>> getOutputs(){ return outputs; }
 
     public RandomClassifier(DataSet dataset,
                             int maxIterations,
@@ -58,6 +63,8 @@ public class RandomClassifier extends Classifier {
 
             // this is the real output of the classifier
             output = Arrays.asList(xCoefficient, yCoefficient, constant);
+            outputs.add(output);
+
 
             // everything below is just for internal viewing of how the output is changing
             // in the final project, such changes will be dynamically visible in the UI
@@ -71,6 +78,7 @@ public class RandomClassifier extends Classifier {
                 break;
             }
         }
+        // if continue is false, each display button increases the i counter in the for loop until max iterations, then display button is disabled.
     }
 
     // for internal viewing only

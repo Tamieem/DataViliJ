@@ -36,7 +36,7 @@ public class AlgorithmConfiguration extends Stage{
 
     private int maxIterations;
     private int updateInterval;
-    private int numberOfClusters;
+    private int numberOfClusters = 0;
     private boolean toContinue;
     private TextArea upInt = new TextArea();
     private TextArea maxIt = new TextArea();
@@ -65,6 +65,7 @@ public class AlgorithmConfiguration extends Stage{
     public void setUpdateInterval(int updateInterval){
         this.updateInterval=updateInterval;
     }
+
     public boolean tocontinue() {
         return toContinue;
     }

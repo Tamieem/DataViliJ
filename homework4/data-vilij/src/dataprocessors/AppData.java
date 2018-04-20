@@ -61,6 +61,6 @@ public class AppData implements DataComponent {
     }
 
     public void displayData() {
-        processor.toChartData(((AppUI) applicationTemplate.getUIComponent()).getScatterChart(), ((AppUI) applicationTemplate.getUIComponent()).getLineChart());
+        processor.toChartData((((AppUI) applicationTemplate.getUIComponent()).getLineChart()));
     }
 }

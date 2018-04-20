@@ -1,7 +1,12 @@
 package ui;
 
+import Strategies.ClassificationContext;
+import Strategies.RandomClassificationStrategy;
 import actions.AppActions;
 import algorithms.AlgorithmConfiguration;
+import algorithms.Classifier;
+import classification.DataSet;
+import classification.RandomClassifier;
 import dataprocessors.AppData;
 import dataprocessors.TSDProcessor;
 import javafx.beans.value.ChangeListener;
@@ -22,7 +27,10 @@ import vilij.templates.ApplicationTemplate;
 import vilij.templates.UITemplate;
 import vilij.components.Dialog;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Collections;
 import java.util.List;
 
 import static settings.AppPropertyTypes.*;
@@ -50,8 +58,8 @@ public final class AppUI extends UITemplate {
     private String                       cssPath;
     private String                       lineChartPath;
     private String                       textAreaPath;
-    private ScatterChart<Number, Number> chart;          // the chart where data will be displayed
-    private LineChart<Number, Number> lineChart;
+    private ScatterChart<Number, Number> chart1;          // the chart where data will be displayed
+    private LineChart<Number, Number>    chart;
     private Button                       displayButton;// workspace button to display data on the chart
     private Button                       validateButton;
     private TextArea textArea;       // text area for new data input
@@ -82,6 +90,12 @@ public final class AppUI extends UITemplate {
     private String configuration;
     AlgorithmConfiguration runConfig;
 
+    Classifier classifier;
+    TSDProcessor tsd;
+
+    private DataSet dataSet = new DataSet();
+    private ClassificationContext classificationContext = new ClassificationContext();
+
     public void setLabel(Label label) { this.label = label; }
 
     public HBox getHB(){ return hB; }
@@ -96,9 +110,8 @@ public final class AppUI extends UITemplate {
     public void setOptions(List options){ this.options = options; }
 
 
+    public LineChart<Number, Number> getLineChart(){ return chart; }
 
-    public ScatterChart<Number, Number> getScatterChart() { return chart; }
-    public LineChart<Number, Number> getLineChart(){ return lineChart; }
 
     public AppUI(Stage primaryStage, ApplicationTemplate applicationTemplate) {
         super(primaryStage, applicationTemplate);
@@ -183,21 +196,11 @@ public final class AppUI extends UITemplate {
     private void layout() {
         // TODO for homework 1
         StackPane sp = new StackPane();
-        lineChart = new LineChart<Number, Number>(new NumberAxis(), new NumberAxis());
-        chart = new ScatterChart<Number, Number>(lineChart.getXAxis(), lineChart.getYAxis());
-        lineChart.setLegendVisible(false);
-        lineChart.setAnimated(true);
-        lineChart.setCreateSymbols(true);
-        lineChart.setAlternativeRowFillVisible(false);
-        lineChart.setAlternativeColumnFillVisible(false);
-        lineChart.setHorizontalGridLinesVisible(false);
-        lineChart.setVerticalGridLinesVisible(false);
-        lineChart.getXAxis().setVisible(false);
-        lineChart.getYAxis().setVisible(false);
+        chart = new LineChart<Number, Number>(new NumberAxis(), new NumberAxis());
         chart.setTitle(applicationTemplate.manager.getPropertyValue(CHART_TITLE.name()));
         sp.setPrefHeight(700);
         sp.setPrefWidth(700);
-        sp.getChildren().add(lineChart);
+        sp.getChildren().add(chart);
         BorderPane bp = new BorderPane();
         appPane.getChildren().add(bp);
         bp.setRight(sp);
@@ -261,6 +264,21 @@ public final class AppUI extends UITemplate {
         chart.setCursor(Cursor.CROSSHAIR);
         textArea.setPrefRowCount(10);
 
+        classificationGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>(){
+            public void changed(ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) {
+
+                if (classificationGroup.getSelectedToggle() != null) {
+                    if(classificationGroup.getSelectedToggle()== rb1)
+                        classificationContext.setClassificationStrategy(new RandomClassificationStrategy());
+
+
+
+
+                }
+
+            }
+        });
+
 
 
 
@@ -279,17 +297,21 @@ public final class AppUI extends UITemplate {
                     if (((String) options.get(newValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLASSIFICATION.name()))) {
                         if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name()))) {
                             runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
+                            displayButton.setDisable(true);
                             savedConfig = false;
-                        } else if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(SELECT_ALGORITHM_TYPE.name())))
+                        } else if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(SELECT_ALGORITHM_TYPE.name()))) {
                             runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
+                            displayButton.setDisable(true);
+                        }
                         vB.getChildren().add(classifcationHB);
                         vB.getChildren().add(displayButton);
-                        displayButton.setOnAction(e -> handleClassifcationDisplayRequest());
+                        displayButton.setOnAction(e -> handleClassificationDisplayRequest());
 
                     } else if (((String) options.get(newValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name()))) {
                         if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLASSIFICATION.name()))) {
-                           // runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
-                            savedConfig = false;
+                           runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
+                           displayButton.setDisable(true);
+                           savedConfig = false;
                         } else if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(SELECT_ALGORITHM_TYPE.name())))
                             runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
                         vB.getChildren().add(clusteringHB);
@@ -300,8 +322,11 @@ public final class AppUI extends UITemplate {
                         if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLASSIFICATION.name()))) {
                             vB.getChildren().remove(classifcationHB);
                             savedConfig = false;
-                        } else if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name())))
+                        } else if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name()))) {
+                            runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
+                            displayButton.setDisable(true);
                             vB.getChildren().remove(clusteringHB);
+                        }
                         vB.getChildren().remove(displayButton);
                     }
                 } catch(IndexOutOfBoundsException e){}
@@ -314,13 +339,12 @@ public final class AppUI extends UITemplate {
 
     public void handleDisplayRequest() { // CUSTOM METHOD
         AppData appData=new AppData(applicationTemplate);
-        TSDProcessor tsd = new TSDProcessor();
+        tsd = new TSDProcessor();
         chart.getData().clear();
-        lineChart.getData().clear();
         data= textArea.getText();
         try {
             tsd.processString(data);
-            tsd.toChartData(chart, lineChart);
+            tsd.toChartData(chart);
             scrnshotButton.setDisable(false);
         } catch (Exception E) {
             ErrorDialog errorDialogue= (ErrorDialog) applicationTemplate.getDialog(Dialog.DialogType.ERROR);
@@ -344,10 +368,37 @@ public final class AppUI extends UITemplate {
         }
     }
 
-    public void handleClassifcationDisplayRequest(){
+    public void handleClassificationDisplayRequest(){
         // TODO: hw5
+       dataSet= new DataSet();
+        tsd = new TSDProcessor();
         //LineChart and shit
+    //    classificationContext.runAlgorithm(dataSet);
+        if(((AppActions)applicationTemplate.getActionComponent()).getSavedFile()!=null) {
+            try {
+                dataSet = dataSet.fromTSDFile(((AppActions) applicationTemplate.getActionComponent()).getSavedFile().toPath());
+            } catch (IOException e) {
+            }
+        } else {
+            try {
+                dataSet = dataSet.fromTSDFile(new File(textArea.getText()).toPath());
+            } catch (IOException e1) {
+            }
+        }
+            Collections.sort(dataSet.getxComponent());
+            Double min = dataSet.getxComponent().get(0);
+            Double max = dataSet.getxComponent().get(dataSet.getxComponent().size() - 1);
+            int maxIt = runConfig.getMaxIterations();
+            int interval = runConfig.getUpdateInterval();
+            boolean continuous = runConfig.tocontinue();
+            classifier = new RandomClassifier(dataSet, maxIt, interval, continuous);
+            classifier.run();
+            List<Integer> list = classifier.getOutput();
+            chart.getData().add(tsd.equationSolver(min, max, list));
+
+
     }
+    public Classifier getClassifier(){ return classifier; }
 
     public void handleClusteringDisplayRequest(){
         //TODO: hw5

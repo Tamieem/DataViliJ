@@ -56,7 +56,10 @@ public final class TSDProcessor {
     String points ="";
     StringArray names= new StringArray();
     private int counter;
+    private Double ymin;
+    private Double ymax;
     ArrayList yComponent= new ArrayList<Double>();
+    ArrayList xComponent= new ArrayList<Double>();
 
 
     public TSDProcessor() {
@@ -90,6 +93,7 @@ public final class TSDProcessor {
                         String[] pair  = list.get(2).split(",");
                         Point2D  point = new Point2D(Double.parseDouble(pair[0]), Double.parseDouble(pair[1]));
                         yComponent.add(point.getY());
+                        xComponent.add(point.getX());
                         names.add(name);
                         dataLabels.put(name, label);
                         dataPoints.put(name, point);
@@ -114,42 +118,50 @@ public final class TSDProcessor {
      *
      * @param chart the specified chart
      */
-    public void toChartData(XYChart<Number, Number> chart, XYChart<Number, Number> lineChart) {
+    public void toChartData(XYChart<Number, Number> chart) {
         Set<String> labels = new HashSet<>(dataLabels.values());
         // Line Chart data
-        int i=0;
-        double j=0;
-        for(i=0; i< yComponent.size();i++){
-            j+= (double)yComponent.get(i);
+        int i = 0;
+        double j = 0;
+        for (i = 0; i < yComponent.size(); i++) {
+            j += (double) yComponent.get(i);
         }
-        j= j/i; // average value;
-        final double average= j;
-        //ScatterChart
+        j = j / i; // average value;
+        final double average = j;
         for (String label : labels) {
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            XYChart.Series<Number, Number> series1= new XYChart.Series<>();
             series.setName(label);
             dataLabels.entrySet().stream().filter(entry -> entry.getValue().equals(label)).forEach(entry -> {
                 Point2D point = dataPoints.get(entry.getKey());
                 series.getData().add(new XYChart.Data<>(point.getX(), point.getY()));
-                series1.getData().add(new XYChart.Data<>(point.getX(), average));
             });
             chart.getData().add(series);
-            lineChart.getData().add(series1);
-
         }
         // ToolTip
-        i=0;
+        i = 0;
         for (XYChart.Series<Number, Number> s : chart.getData()) {
             for (XYChart.Data<Number, Number> d : s.getData()) {
                 Tooltip.install(d.getNode(), new Tooltip(names.get(i)));
                 d.getNode().setOnMouseEntered(event -> chart.setCursor(Cursor.CROSSHAIR));
                 d.getNode().setOnMouseExited(event -> chart.setCursor(Cursor.DEFAULT));
                 i++;
+
             }
         }
-
     }
+   public XYChart.Series<Number, Number> equationSolver(Double xmin, Double xmax, List<Integer> list){
+        int a = list.get(0);
+        int b= list.get(1);
+        int c= list.get(2);
+        ymin = -(c+a*xmin)/b;
+        ymax= -(c+a*xmax)/b;
+        XYChart.Series<Number, Number> series1 = new XYChart.Series<>();
+        series1.getData().add(new XYChart.Data<>(xmin, ymin));
+        series1.getData().add(new XYChart.Data<>(xmax, ymax));
+        return series1;
+    }
+
+
 
     void clear() {
         dataPoints.clear();

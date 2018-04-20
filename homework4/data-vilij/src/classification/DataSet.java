@@ -5,6 +5,7 @@ import javafx.geometry.Point2D;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -45,6 +46,7 @@ public class DataSet {
 
     private Map<String, String> labels;
     private Map<String, Point2D> locations;
+    private ArrayList<Double> xComponent = new ArrayList<Double>();
 
     /** Creates an empty dataset. */
     public DataSet() {
@@ -56,6 +58,8 @@ public class DataSet {
 
     public Map<String, Point2D> getLocations() { return locations; }
 
+    public ArrayList<Double> getxComponent(){ return xComponent; }
+
     public void updateLabel(String instanceName, String newlabel) {
         if (labels.get(instanceName) == null)
             throw new NoSuchElementException();
@@ -66,6 +70,7 @@ public class DataSet {
         String[] arr = tsdLine.split("\t");
         labels.put(nameFormatCheck(arr[0]), arr[1]);
         locations.put(arr[0], locationOf(arr[2]));
+        xComponent.add(locationOf(arr[2]).getX());
     }
 
     public static DataSet fromTSDFile(Path tsdFilePath) throws IOException {

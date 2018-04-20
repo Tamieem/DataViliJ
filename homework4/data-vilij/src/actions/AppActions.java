@@ -185,7 +185,7 @@ public final class AppActions implements ActionComponent {
     public void handleScreenshotRequest() throws IOException {
         // TODO: NOT A PART OF HW 1
         AppUI app= (AppUI) applicationTemplate.getUIComponent();
-        WritableImage image= app.getScatterChart().snapshot(new SnapshotParameters(), null);
+        WritableImage image= app.getLineChart().snapshot(new SnapshotParameters(), null);
         File file = new File("chart.png");
         ImageIO.write(SwingFXUtils.fromFXImage(image,null), "png", file);
 
