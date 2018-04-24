@@ -178,7 +178,7 @@ public class AlgorithmConfiguration extends Stage{
                 try {
                     updateInterval = Integer.parseInt(upInt.getText());
                 }catch (NumberFormatException e){
-                    updateInterval= 0;
+                    updateInterval= 1;
                 }
             }
         });

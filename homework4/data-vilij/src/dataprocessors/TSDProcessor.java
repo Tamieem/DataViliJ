@@ -136,6 +136,7 @@ public final class TSDProcessor {
                 series.getData().add(new XYChart.Data<>(point.getX(), point.getY()));
             });
             chart.getData().add(series);
+            series.getNode().setVisible(false);
         }
         // ToolTip
         i = 0;

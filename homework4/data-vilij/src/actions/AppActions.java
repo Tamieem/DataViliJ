@@ -102,9 +102,9 @@ public final class AppActions implements ActionComponent {
         app.setOptions(app.getChoiceBox().getItems());
         app.getChoiceBox().getSelectionModel().selectFirst();
         app.getVB().getChildren().add(app.getChoiceBox());
-        //       app.setWorkspaceActions();
 
     }
+    public TSDProcessor getLabelProcessor(){ return LabelProcessor; }
 
 
     @Override

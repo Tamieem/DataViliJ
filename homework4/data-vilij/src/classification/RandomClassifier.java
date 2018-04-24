@@ -3,9 +3,13 @@ package classification;
 import algorithms.Classifier;
 import dataprocessors.TSDProcessor;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import ui.AppUI;
+import vilij.templates.ApplicationTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +33,8 @@ public class RandomClassifier extends Classifier {
     private TSDProcessor tsd;
     private LineChart<Number, Number> chart;
     private List<List<Integer>> outputs = new ArrayList<List<Integer>>();
+    private ApplicationTemplate applicationTemplate;
+
 
     // currently, this value does not change after instantiation
     private final AtomicBoolean tocontinue;
@@ -58,21 +64,24 @@ public class RandomClassifier extends Classifier {
         this.maxIterations = maxIterations;
         this.updateInterval = updateInterval;
         this.tocontinue = new AtomicBoolean(tocontinue);
-        new RandomClassifier(dataset,maxIterations,updateInterval,tocontinue, new TSDProcessor(), new LineChart<Number, Number>(new NumberAxis(), new NumberAxis()));
+        new RandomClassifier(dataset,maxIterations,updateInterval,tocontinue, new TSDProcessor(), new LineChart<Number, Number>(new NumberAxis(), new NumberAxis()), new ApplicationTemplate());
     }
-    public RandomClassifier(DataSet dataset, int maxIterations, int updateInterval, boolean tocontinue, TSDProcessor tsd, LineChart<Number, Number> chart){
+    public RandomClassifier(DataSet dataset, int maxIterations, int updateInterval, boolean tocontinue, TSDProcessor tsd, LineChart<Number, Number> chart, ApplicationTemplate applicationTemplate){
         this.dataset=dataset;
         this.maxIterations=maxIterations;
         this.updateInterval=updateInterval;
         this.tocontinue=new AtomicBoolean(tocontinue);
         this.tsd=tsd;
         this.chart= chart;
+        this.applicationTemplate=applicationTemplate;
 
     }
 
     @Override
-    public void run() {
-        for (int i = 1; i <= maxIterations && tocontinue(); i++) {
+    public synchronized void run() {
+        for (int i = 1; i <= maxIterations; i++) {
+            ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(true);
+            ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(true);
             int xCoefficient = new Double(RAND.nextDouble() * 100).intValue();
             int yCoefficient = new Double(RAND.nextDouble() * 100).intValue();
             int constant     = new Double(RAND.nextDouble() * 100).intValue();
@@ -95,6 +104,7 @@ public class RandomClassifier extends Classifier {
             }
 
             try {
+                ((AppUI)applicationTemplate.getUIComponent()).setFirstRandomClassifier(false);
                 Collections.sort(dataset.getxComponent());
                 Double min = dataset.getxComponent().get(0);
                 Double max = dataset.getxComponent().get(dataset.getxComponent().size() - 1);
@@ -102,16 +112,31 @@ public class RandomClassifier extends Classifier {
                 Thread.sleep(1000);
                 Platform.runLater(() -> chart.getData().add(series));
                 Thread.sleep(1000);
-                if(i!= maxIterations)
+                if(!tocontinue()) {
+                    ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
+                    ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
+                    wait();
+                }
+                if(i != maxIterations)
                     Platform.runLater(()-> chart.getData().remove(series));
-
                 } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
         }
+        ((AppUI)applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
+        ((AppUI)applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
+        System.out.println("done");
+        try{
+            if(!tocontinue())
+            wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         // if continue is false, each display button increases the i counter in the for loop until max iterations, then display button is disabled.
     }
+
+
 
     // for internal viewing only
     protected void flush() {

@@ -12,6 +12,8 @@ import dataprocessors.TSDProcessor;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.chart.LineChart;
@@ -370,33 +372,46 @@ public final class AppUI extends UITemplate {
         }
     }
 
-    public void handleClassificationDisplayRequest(){
+    public void handleClassificationDisplayRequest() {
         handleDisplayRequest();
         // TODO: hw5
-       dataSet= new DataSet();
-        //LineChart and shit
-    //    classificationContext.runAlgorithm(dataSet);
-        if(((AppActions)applicationTemplate.getActionComponent()).getSavedFile()!=null) {
-            try {
-                dataSet = dataSet.fromTSDFile(((AppActions) applicationTemplate.getActionComponent()).getSavedFile().toPath());
-            } catch (IOException e) {
-            }
-        } else {
-            try {
-                dataSet = dataSet.fromTSDFile(new File(textArea.getText()).toPath());
-            } catch (IOException e1) {
-            }
-       }
-//        Collections.sort(dataSet.getxComponent());
-//        Double min = dataSet.getxComponent().get(0);
-//        Double max = dataSet.getxComponent().get(dataSet.getxComponent().size() - 1);
+        scrnshotButton.setDisable(true);
+        displayButton.setDisable(true);
         int maxIt = runConfig.getMaxIterations();
         int interval = runConfig.getUpdateInterval();
         boolean continuous = runConfig.tocontinue();
-        Thread runAlg = new Thread (new RandomClassifier(dataSet, maxIt, interval, continuous, tsd, chart));
-        runAlg.start();
+        //LineChart and shit
+        if (continuous ||firstRandomClassifier) {
+            if (((AppActions) applicationTemplate.getActionComponent()).getSavedFile() != null) {
+                dataSet = new DataSet();
+                try {
+                    dataSet = dataSet.fromTSDFile(((AppActions) applicationTemplate.getActionComponent()).getSavedFile().toPath());
+                } catch (IOException e) {
+                    System.out.print("");
+                }
+            } else {
+                try {
+                    dataSet = dataSet.fromTSDFile(textArea.getText());
+                } catch (IOException e1) {
+                    System.out.print("");
+                }
+            }
+            classifier = new RandomClassifier(dataSet, maxIt, interval, continuous, tsd, chart, applicationTemplate);
+            Thread runAlg = new Thread(classifier);
+            runAlg.start();
+        }
+        else {
+            synchronized (classifier) {
+                classifier.notify();
+            }
+        }
+
 
     }
+    public boolean firstRandomClassifier = true;
+    public void setFirstRandomClassifier(boolean val){ firstRandomClassifier=val; }
+    public Button getDisplayButton(){ return displayButton; }
+    public Button getScreenshotButton(){ return scrnshotButton; }
     public Classifier getClassifier(){ return classifier; }
 
     public void handleClusteringDisplayRequest(){
