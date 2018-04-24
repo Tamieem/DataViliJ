@@ -99,10 +99,11 @@ public class RandomClassifier extends Classifier {
                 Double min = dataset.getxComponent().get(0);
                 Double max = dataset.getxComponent().get(dataset.getxComponent().size() - 1);
                 XYChart.Series series= tsd.equationSolver(min, max, output);
-                Thread.sleep(500);
+                Thread.sleep(1000);
                 Platform.runLater(() -> chart.getData().add(series));
                 Thread.sleep(1000);
-                Platform.runLater(()-> chart.getData().remove(series));
+                if(i!= maxIterations)
+                    Platform.runLater(()-> chart.getData().remove(series));
 
                 } catch (InterruptedException e) {
                 e.printStackTrace();
