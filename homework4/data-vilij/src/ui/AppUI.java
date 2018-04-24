@@ -9,8 +9,10 @@ import classification.DataSet;
 import classification.RandomClassifier;
 import dataprocessors.AppData;
 import dataprocessors.TSDProcessor;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -195,18 +197,18 @@ public final class AppUI extends UITemplate {
 
     private void layout() {
         // TODO for homework 1
-        StackPane sp = new StackPane();
         chart = new LineChart<Number, Number>(new NumberAxis(), new NumberAxis());
         chart.setTitle(applicationTemplate.manager.getPropertyValue(CHART_TITLE.name()));
-        sp.setPrefHeight(700);
-        sp.setPrefWidth(700);
-        sp.getChildren().add(chart);
+        StackPane sp = new StackPane(chart);
+        sp.setMaxSize(windowWidth * 0.59, windowHeight * 0.59);
+        sp.setMinSize(windowWidth * 0.59, windowHeight * 0.59);
+        StackPane.setAlignment(sp, Pos.CENTER);
         BorderPane bp = new BorderPane();
         appPane.getChildren().add(bp);
         bp.setRight(sp);
         textArea = new TextArea();
         displayButton = new Button(applicationTemplate.manager.getPropertyValue(DISPLAY.name()));
-        vB.setPrefWidth(400);
+        vB.setMaxWidth(windowWidth*.41);
         bp.setLeft(vB);
 
         cb1= new CheckBox(applicationTemplate.manager.getPropertyValue(READ_ONLY.name()));
@@ -369,9 +371,9 @@ public final class AppUI extends UITemplate {
     }
 
     public void handleClassificationDisplayRequest(){
+        handleDisplayRequest();
         // TODO: hw5
        dataSet= new DataSet();
-        tsd = new TSDProcessor();
         //LineChart and shit
     //    classificationContext.runAlgorithm(dataSet);
         if(((AppActions)applicationTemplate.getActionComponent()).getSavedFile()!=null) {
@@ -384,18 +386,15 @@ public final class AppUI extends UITemplate {
                 dataSet = dataSet.fromTSDFile(new File(textArea.getText()).toPath());
             } catch (IOException e1) {
             }
-        }
-            Collections.sort(dataSet.getxComponent());
-            Double min = dataSet.getxComponent().get(0);
-            Double max = dataSet.getxComponent().get(dataSet.getxComponent().size() - 1);
-            int maxIt = runConfig.getMaxIterations();
-            int interval = runConfig.getUpdateInterval();
-            boolean continuous = runConfig.tocontinue();
-            classifier = new RandomClassifier(dataSet, maxIt, interval, continuous);
-            classifier.run();
-            List<Integer> list = classifier.getOutput();
-            chart.getData().add(tsd.equationSolver(min, max, list));
-
+       }
+//        Collections.sort(dataSet.getxComponent());
+//        Double min = dataSet.getxComponent().get(0);
+//        Double max = dataSet.getxComponent().get(dataSet.getxComponent().size() - 1);
+        int maxIt = runConfig.getMaxIterations();
+        int interval = runConfig.getUpdateInterval();
+        boolean continuous = runConfig.tocontinue();
+        Thread runAlg = new Thread (new RandomClassifier(dataSet, maxIt, interval, continuous, tsd, chart));
+        runAlg.start();
 
     }
     public Classifier getClassifier(){ return classifier; }

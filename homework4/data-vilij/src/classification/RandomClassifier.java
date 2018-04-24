@@ -1,12 +1,16 @@
 package classification;
 
 import algorithms.Classifier;
+import dataprocessors.TSDProcessor;
+import javafx.application.Platform;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -22,6 +26,8 @@ public class RandomClassifier extends Classifier {
 
     private final int maxIterations;
     private final int updateInterval;
+    private TSDProcessor tsd;
+    private LineChart<Number, Number> chart;
     private List<List<Integer>> outputs = new ArrayList<List<Integer>>();
 
     // currently, this value does not change after instantiation
@@ -52,6 +58,16 @@ public class RandomClassifier extends Classifier {
         this.maxIterations = maxIterations;
         this.updateInterval = updateInterval;
         this.tocontinue = new AtomicBoolean(tocontinue);
+        new RandomClassifier(dataset,maxIterations,updateInterval,tocontinue, new TSDProcessor(), new LineChart<Number, Number>(new NumberAxis(), new NumberAxis()));
+    }
+    public RandomClassifier(DataSet dataset, int maxIterations, int updateInterval, boolean tocontinue, TSDProcessor tsd, LineChart<Number, Number> chart){
+        this.dataset=dataset;
+        this.maxIterations=maxIterations;
+        this.updateInterval=updateInterval;
+        this.tocontinue=new AtomicBoolean(tocontinue);
+        this.tsd=tsd;
+        this.chart= chart;
+
     }
 
     @Override
@@ -77,6 +93,21 @@ public class RandomClassifier extends Classifier {
                 flush();
                 break;
             }
+
+            try {
+                Collections.sort(dataset.getxComponent());
+                Double min = dataset.getxComponent().get(0);
+                Double max = dataset.getxComponent().get(dataset.getxComponent().size() - 1);
+                XYChart.Series series= tsd.equationSolver(min, max, output);
+                Thread.sleep(500);
+                Platform.runLater(() -> chart.getData().add(series));
+                Thread.sleep(1000);
+                Platform.runLater(()-> chart.getData().remove(series));
+
+                } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
         // if continue is false, each display button increases the i counter in the for loop until max iterations, then display button is disabled.
     }
