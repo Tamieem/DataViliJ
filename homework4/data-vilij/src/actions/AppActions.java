@@ -174,17 +174,17 @@ public final class AppActions implements ActionComponent {
             if (exitDialog.getSelectedOption() == ConfirmationDialog.Option.CANCEL || exitDialog.getSelectedOption() == ConfirmationDialog.Option.NO)
                 return;
             if (exitDialog.getSelectedOption() == ConfirmationDialog.Option.YES) {
-                stage.close();
+                System.exit(1);
             }
         }
         else if (app.getHasNewText()) {
             if(promptToSave())
-                stage.close();
+                System.exit(2);
             else
                 return;
         }
         else
-            stage.close();
+            System.exit(3);
 
 
     }

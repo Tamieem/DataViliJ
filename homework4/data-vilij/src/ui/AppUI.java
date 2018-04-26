@@ -98,6 +98,7 @@ public final class AppUI extends UITemplate {
 
     Classifier classifier;
     TSDProcessor tsd;
+    private Thread runAlg;
 
     private DataSet dataSet = new DataSet();
     private ClassificationContext classificationContext = new ClassificationContext();
@@ -401,7 +402,7 @@ public final class AppUI extends UITemplate {
                 }
             }
             classifier = new RandomClassifier(dataSet, maxIt, interval, continuous, tsd, chart, applicationTemplate);
-            Thread runAlg = new Thread(classifier);
+            runAlg = new Thread(classifier);
             runAlg.start();
         }
         else {
@@ -425,6 +426,7 @@ public final class AppUI extends UITemplate {
     public Button getScreenshotButton(){ return scrnshotButton; }
     public HBox getDisplayButtonBox() {return displayButtonBox; }
     public Classifier getClassifier(){ return classifier; }
+    public Thread getRunAlg(){ return runAlg; }
 
     public void handleClusteringDisplayRequest(){
         //TODO: hw5
