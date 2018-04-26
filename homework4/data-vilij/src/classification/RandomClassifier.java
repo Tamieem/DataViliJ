@@ -86,12 +86,14 @@ public class RandomClassifier extends Classifier {
 
     @Override
     public synchronized void run() {
-        if(((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().contains(finished))
-            ((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().remove(finished);
+//        if(((AppUI)applicationTemplate.getUIComponent()).getAlgState().getText().equals(
+//                applicationTemplate.manager.getPropertyValue(FINISHED_RUNNING_ALGORITHM.name())))
+//            ((AppUI)applicationTemplate.getUIComponent()).setAlgState("");
         for (int i = 1; i <= maxIterations; i++) {
+            ((AppUI) applicationTemplate.getUIComponent()).setRunningState(true);
             ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(true);
             ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(true);
-            
+
             int xCoefficient =  new Long(-1 * Math.round((2 * RAND.nextDouble() - 1) * 10)).intValue();
             int yCoefficient = 10;
             int constant     = RAND.nextInt(11);
@@ -125,7 +127,7 @@ public class RandomClassifier extends Classifier {
                     if(!tocontinue()) {
                         ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
                         ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
-                        unfinished.setText(applicationTemplate.manager.getPropertyValue(UNFINISHED_RUNNING_ALGORITHM.name()));
+//                        ((AppUI) applicationTemplate.getUIComponent()).setAlgState(applicationTemplate.manager.getPropertyValue(UNFINISHED_RUNNING_ALGORITHM.name()));
 //                    ((AppUI) applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().add(unfinished);
                         wait();
                     }
@@ -138,12 +140,14 @@ public class RandomClassifier extends Classifier {
             }
 
         }
+        ((AppUI) applicationTemplate.getUIComponent()).setRunningState(false);
         ((AppUI)applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
         ((AppUI)applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
         ((AppUI)applicationTemplate.getUIComponent()).getConfigButton1().setDisable(false);
         ((AppUI)applicationTemplate.getUIComponent()).getConfigButton2().setDisable(false);
-        ((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().remove(unfinished);
-        finished.setText(applicationTemplate.manager.getPropertyValue(FINISHED_RUNNING_ALGORITHM.name()));
+//        ((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().remove(unfinished);
+//        finished.setText(applicationTemplate.manager.getPropertyValue(FINISHED_RUNNING_ALGORITHM.name()));
+//        ((AppUI)applicationTemplate.getUIComponent()).setAlgState(applicationTemplate.manager.getPropertyValue(FINISHED_RUNNING_ALGORITHM.name()));
         ((AppUI)applicationTemplate.getUIComponent()).setFirstRandomClassifier(true);
     //    ((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().add(finished);
     //    System.out.println("done");

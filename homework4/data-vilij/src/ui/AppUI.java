@@ -79,6 +79,7 @@ public final class AppUI extends UITemplate {
 
     private Button configButton1;
     private Button configButton2;
+    private Label algState = new Label("");
 
     private List options;
     private ToggleGroup clusteringGroup = new ToggleGroup();
@@ -237,7 +238,7 @@ public final class AppUI extends UITemplate {
         clusteringHB.getChildren().add(configButton2);
         rb2.setToggleGroup(clusteringGroup);
         rb2.setSelected(true);
-        displayButtonBox.getChildren().add(displayButton);
+        displayButtonBox.getChildren().addAll(displayButton, algState);
     }
 
     public void setWorkspaceActions(){
@@ -411,10 +412,15 @@ public final class AppUI extends UITemplate {
 
 
     }
+    public void setAlgState(String string){ algState.setText(string); }
+    public Label getAlgState(){ return algState; }
     public Button getConfigButton1(){ return configButton1; }
     public Button getConfigButton2(){ return configButton2; }
     private boolean firstRandomClassifier = true;
     public void setFirstRandomClassifier(boolean val){ firstRandomClassifier=val; }
+    private boolean running = false;
+    public void setRunningState(boolean val){ running = val;}
+    public boolean getRunningState(){ return running; }
     public Button getDisplayButton(){ return displayButton; }
     public Button getScreenshotButton(){ return scrnshotButton; }
     public HBox getDisplayButtonBox() {return displayButtonBox; }
