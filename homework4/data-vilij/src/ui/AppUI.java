@@ -84,6 +84,7 @@ public final class AppUI extends UITemplate {
     private ToggleGroup clusteringGroup = new ToggleGroup();
     private HBox clusteringHB = new HBox();
     private RadioButton rb2= new RadioButton("Random Clustering");
+    private HBox displayButtonBox = new HBox();
 
 
     private ToggleGroup classificationGroup = new ToggleGroup();
@@ -236,6 +237,7 @@ public final class AppUI extends UITemplate {
         clusteringHB.getChildren().add(configButton2);
         rb2.setToggleGroup(clusteringGroup);
         rb2.setSelected(true);
+        displayButtonBox.getChildren().add(displayButton);
     }
 
     public void setWorkspaceActions(){
@@ -294,9 +296,9 @@ public final class AppUI extends UITemplate {
                     if (newValue.intValue() == -1) ;
 
                     if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLASSIFICATION.name())))
-                        vB.getChildren().removeAll(classifcationHB,displayButton);
+                        vB.getChildren().removeAll(classifcationHB, displayButtonBox );
                     else if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name())))
-                        vB.getChildren().removeAll(clusteringHB, displayButton);
+                        vB.getChildren().removeAll(clusteringHB, displayButtonBox);
 
                     if (((String) options.get(newValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLASSIFICATION.name()))) {
                         if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name()))) {
@@ -308,7 +310,7 @@ public final class AppUI extends UITemplate {
                             displayButton.setDisable(true);
                         }
                         vB.getChildren().add(classifcationHB);
-                        vB.getChildren().add(displayButton);
+                        vB.getChildren().add(displayButtonBox);
                         displayButton.setOnAction(e -> handleClassificationDisplayRequest());
 
                     } else if (((String) options.get(newValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(CLUSTERING.name()))) {
@@ -319,7 +321,7 @@ public final class AppUI extends UITemplate {
                         } else if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(SELECT_ALGORITHM_TYPE.name())))
                             runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
                         vB.getChildren().add(clusteringHB);
-                        vB.getChildren().add(displayButton);
+                        vB.getChildren().add(displayButtonBox);
                         displayButton.setOnAction(e -> handleClusteringDisplayRequest());
                     }
                     else if (((String) options.get(newValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(SELECT_ALGORITHM_TYPE.name()))) {
@@ -331,7 +333,7 @@ public final class AppUI extends UITemplate {
                             displayButton.setDisable(true);
                             vB.getChildren().remove(clusteringHB);
                         }
-                        vB.getChildren().remove(displayButton);
+                        vB.getChildren().remove(displayButtonBox);
                     }
                 } catch(IndexOutOfBoundsException e){}
             }
@@ -377,6 +379,7 @@ public final class AppUI extends UITemplate {
         // TODO: hw5
         scrnshotButton.setDisable(true);
         displayButton.setDisable(true);
+        configButton1.setDisable(true);
         int maxIt = runConfig.getMaxIterations();
         int interval = runConfig.getUpdateInterval();
         boolean continuous = runConfig.tocontinue();
@@ -408,10 +411,13 @@ public final class AppUI extends UITemplate {
 
 
     }
-    public boolean firstRandomClassifier = true;
+    public Button getConfigButton1(){ return configButton1; }
+    public Button getConfigButton2(){ return configButton2; }
+    private boolean firstRandomClassifier = true;
     public void setFirstRandomClassifier(boolean val){ firstRandomClassifier=val; }
     public Button getDisplayButton(){ return displayButton; }
     public Button getScreenshotButton(){ return scrnshotButton; }
+    public HBox getDisplayButtonBox() {return displayButtonBox; }
     public Classifier getClassifier(){ return classifier; }
 
     public void handleClusteringDisplayRequest(){

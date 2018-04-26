@@ -71,6 +71,8 @@ functionality within the main workspace. -->
         <property name="CONTINUOUS_RUN" value="Continuous Run?"/>
         <property name="UPDATE_INTERVAL" value="Update Interval:"/>
         <property name="RUNTIME_CONFIGURATIONS" value="Runtime Configuration"/>
+        <property name="FINISHED_RUNNING_ALGORITHM" value="This algorithm has finished running."/>
+        <property name="UNFINISHED_RUNNING_ALGORITHM" value="Press Display to continue the algorithm"/>
 
 
     </property_list>

@@ -8,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import ui.AppUI;
 import vilij.templates.ApplicationTemplate;
 
@@ -16,6 +17,9 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static settings.AppPropertyTypes.FINISHED_RUNNING_ALGORITHM;
+import static settings.AppPropertyTypes.UNFINISHED_RUNNING_ALGORITHM;
 
 /**
  * @author Ritwik Banerjee
@@ -34,6 +38,9 @@ public class RandomClassifier extends Classifier {
     private LineChart<Number, Number> chart;
     private List<List<Integer>> outputs = new ArrayList<List<Integer>>();
     private ApplicationTemplate applicationTemplate;
+
+    private Label unfinished = new Label();
+    private Label finished = new Label();
 
 
     // currently, this value does not change after instantiation
@@ -79,6 +86,8 @@ public class RandomClassifier extends Classifier {
 
     @Override
     public synchronized void run() {
+        if(((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().contains(finished))
+            ((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().remove(finished);
         for (int i = 1; i <= maxIterations; i++) {
             ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(true);
             ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(true);
@@ -104,21 +113,26 @@ public class RandomClassifier extends Classifier {
             }
 
             try {
-                ((AppUI)applicationTemplate.getUIComponent()).setFirstRandomClassifier(false);
+                ((AppUI) applicationTemplate.getUIComponent()).setFirstRandomClassifier(false);
                 Collections.sort(dataset.getxComponent());
                 Double min = dataset.getxComponent().get(0);
                 Double max = dataset.getxComponent().get(dataset.getxComponent().size() - 1);
-                XYChart.Series series= tsd.equationSolver(min, max, output);
-                Thread.sleep(1000);
-                Platform.runLater(() -> chart.getData().add(series));
-                Thread.sleep(1000);
-                if(!tocontinue()) {
-                    ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
-                    ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
-                    wait();
+                XYChart.Series series = tsd.equationSolver(min, max, output);
+                if (i % updateInterval == 0 || i==maxIterations) {
+                    Thread.sleep(1000);
+                    Platform.runLater(() -> chart.getData().add(series));
+                    Thread.sleep(1000);
+                    if(!tocontinue()) {
+                        ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
+                        ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
+                        unfinished.setText(applicationTemplate.manager.getPropertyValue(UNFINISHED_RUNNING_ALGORITHM.name()));
+//                    ((AppUI) applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().add(unfinished);
+                        wait();
+                    }
+                    if (i != maxIterations)
+                        Platform.runLater(() -> chart.getData().remove(series));
                 }
-                if(i != maxIterations)
-                    Platform.runLater(()-> chart.getData().remove(series));
+
                 } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -126,13 +140,13 @@ public class RandomClassifier extends Classifier {
         }
         ((AppUI)applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
         ((AppUI)applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
-        System.out.println("done");
-        try{
-            if(!tocontinue())
-            wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ((AppUI)applicationTemplate.getUIComponent()).getConfigButton1().setDisable(false);
+        ((AppUI)applicationTemplate.getUIComponent()).getConfigButton2().setDisable(false);
+        ((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().remove(unfinished);
+        finished.setText(applicationTemplate.manager.getPropertyValue(FINISHED_RUNNING_ALGORITHM.name()));
+        ((AppUI)applicationTemplate.getUIComponent()).setFirstRandomClassifier(true);
+    //    ((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().add(finished);
+    //    System.out.println("done");
         // if continue is false, each display button increases the i counter in the for loop until max iterations, then display button is disabled.
     }
 

@@ -69,3 +69,10 @@
 .default-color1.chart-line-symbol {
     -fx-background-color: blue, blue;
 }
+.chart{
+    -fx-horizontal-grid-lines-visible: false;
+    -fx-vertical-grid-lines-visible: false;
+    -fx-font-size: 14px;
+    -fx-vertical-zero-line-visible:false;
+    -fx-horizontal-zero-line-visible:false;
+}
