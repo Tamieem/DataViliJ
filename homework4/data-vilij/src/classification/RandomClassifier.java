@@ -91,10 +91,10 @@ public class RandomClassifier extends Classifier {
         for (int i = 1; i <= maxIterations; i++) {
             ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(true);
             ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(true);
-            int xCoefficient = new Double(RAND.nextDouble() * 100).intValue();
-            int yCoefficient = new Double(RAND.nextDouble() * 100).intValue();
-            int constant     = new Double(RAND.nextDouble() * 100).intValue();
-
+            
+            int xCoefficient =  new Long(-1 * Math.round((2 * RAND.nextDouble() - 1) * 10)).intValue();
+            int yCoefficient = 10;
+            int constant     = RAND.nextInt(11);
             // this is the real output of the classifier
             output = Arrays.asList(xCoefficient, yCoefficient, constant);
             outputs.add(output);
