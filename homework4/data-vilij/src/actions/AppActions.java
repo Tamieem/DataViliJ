@@ -22,6 +22,7 @@ import java.nio.file.Path;
 
 import static settings.AppPropertyTypes.*;
 
+
 /**
  * This is the concrete implementation of the action handlers required by the application.
  *
@@ -165,7 +166,18 @@ public final class AppActions implements ActionComponent {
 
         AppUI app= (AppUI) applicationTemplate.getUIComponent();
         Stage stage= app.getPrimaryWindow();
-        if (app.getHasNewText()) {
+        if(app.getRunningState()) {
+            UITemplate template = (UITemplate) applicationTemplate.getUIComponent();
+            ConfirmationDialog exitDialog = (ConfirmationDialog) applicationTemplate.getDialog(Dialog.DialogType.CONFIRMATION);
+            exitDialog.show(applicationTemplate.manager.getPropertyValue(EXIT_WHILE_RUNNING_TITLE.name()),
+                    applicationTemplate.manager.getPropertyValue(EXIT_WHILE_RUNNING_WARNING.name()));
+            if (exitDialog.getSelectedOption() == ConfirmationDialog.Option.CANCEL || exitDialog.getSelectedOption() == ConfirmationDialog.Option.NO)
+                return;
+            if (exitDialog.getSelectedOption() == ConfirmationDialog.Option.YES) {
+                stage.close();
+            }
+        }
+        else if (app.getHasNewText()) {
             if(promptToSave())
                 stage.close();
             else

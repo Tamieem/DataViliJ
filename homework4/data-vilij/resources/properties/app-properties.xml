@@ -27,6 +27,7 @@ functionality within the main workspace. -->
         <property name="VALIDATE" value="Validate"/>
 
         <!-- WARNING MESSAGES -->
+        <property name="EXIT_WHILE_RUNNING_TITLE" value="Algorithm Currently Running"/>
         <property name="EXIT_WHILE_RUNNING_WARNING"
                   value="An algorithm is running. If you exit now, all unsaved changes will be lost. Are you sure?"/>
 

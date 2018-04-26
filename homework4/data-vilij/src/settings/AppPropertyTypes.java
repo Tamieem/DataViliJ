@@ -37,6 +37,8 @@ public enum AppPropertyTypes {
     /* application-specific message titles */
     SAVE_UNSAVED_WORK_TITLE,
     ERROR_TITLE,
+    EXIT_WHILE_RUNNING_TITLE,
+    EXIT_WHILE_RUNNING_WARNING,
 
     /* application-specific messages */
     SAVE_UNSAVED_WORK,
