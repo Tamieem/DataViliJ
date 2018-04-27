@@ -121,7 +121,6 @@ public class RandomClassifier extends Classifier {
                 Double max = dataset.getxComponent().get(dataset.getxComponent().size() - 1);
                 XYChart.Series series = tsd.equationSolver(min, max, output);
                 if (i % updateInterval == 0 || i==maxIterations) {
-                    Thread.sleep(1000);
                     Platform.runLater(() -> chart.getData().add(series));
                     Thread.sleep(1000);
                     if(!tocontinue()) {
@@ -131,12 +130,14 @@ public class RandomClassifier extends Classifier {
 //                    ((AppUI) applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().add(unfinished);
                         wait();
                     }
-                    if (i != maxIterations)
+                    if (i != maxIterations) {
                         Platform.runLater(() -> chart.getData().remove(series));
+                        Thread.sleep(1000);
+                    }
                 }
 
                 } catch (InterruptedException e) {
-                e.printStackTrace();
+                System.out.print("");
             }
 
         }
