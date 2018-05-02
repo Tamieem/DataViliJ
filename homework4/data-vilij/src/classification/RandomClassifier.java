@@ -3,8 +3,6 @@ package classification;
 import algorithms.Classifier;
 import dataprocessors.TSDProcessor;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -12,14 +10,10 @@ import javafx.scene.control.Label;
 import ui.AppUI;
 import vilij.templates.ApplicationTemplate;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static settings.AppPropertyTypes.FINISHED_RUNNING_ALGORITHM;
-import static settings.AppPropertyTypes.UNFINISHED_RUNNING_ALGORITHM;
 
 /**
  * @author Ritwik Banerjee
@@ -144,8 +138,8 @@ public class RandomClassifier extends Classifier {
         ((AppUI) applicationTemplate.getUIComponent()).setRunningState(false);
         ((AppUI)applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
         ((AppUI)applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
-        ((AppUI)applicationTemplate.getUIComponent()).getConfigButton1().setDisable(false);
-        ((AppUI)applicationTemplate.getUIComponent()).getConfigButton2().setDisable(false);
+        ((AppUI)applicationTemplate.getUIComponent()).getClassificationConfigButton().setDisable(false);
+        ((AppUI)applicationTemplate.getUIComponent()).getRandomClusteringConfigButton().setDisable(false);
 //        ((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().remove(unfinished);
 //        finished.setText(applicationTemplate.manager.getPropertyValue(FINISHED_RUNNING_ALGORITHM.name()));
 //        ((AppUI)applicationTemplate.getUIComponent()).setAlgState(applicationTemplate.manager.getPropertyValue(FINISHED_RUNNING_ALGORITHM.name()));

@@ -31,7 +31,17 @@ public class KMeansClusterer extends Clusterer {
         this.maxIterations = maxIterations;
         this.updateInterval = updateInterval;
         this.tocontinue = new AtomicBoolean(false);
+        new KMeansClusterer(dataset, maxIterations, updateInterval, false, numberOfClusters);
     }
+    public KMeansClusterer(DataSet dataSet, int maxIterations, int updateInterval, boolean tocontinue, int numberOfClusters){
+        super(numberOfClusters);
+        this.dataset=dataSet;
+        this.maxIterations= maxIterations;
+        this.updateInterval= updateInterval;
+        this.tocontinue= new AtomicBoolean(tocontinue);
+
+    }
+
 
     @Override
     public int getMaxIterations() { return maxIterations; }
@@ -43,7 +53,7 @@ public class KMeansClusterer extends Clusterer {
     public boolean tocontinue() { return tocontinue.get(); }
 
     @Override
-    public void run() {
+    public synchronized void run() {
         initializeCentroids();
         int iteration = 0;
         while (iteration++ < maxIterations & tocontinue.get()) {
