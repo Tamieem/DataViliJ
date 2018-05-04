@@ -109,7 +109,7 @@ public class RandomClassifier extends Classifier {
             }
 
             try {
-                ((AppUI) applicationTemplate.getUIComponent()).setFirstRandomClassifier(false);
+                ((AppUI) applicationTemplate.getUIComponent()).setFirstRun(false);
                 Collections.sort(dataset.getxComponent());
                 Double min = dataset.getxComponent().get(0);
                 Double max = dataset.getxComponent().get(dataset.getxComponent().size() - 1);
@@ -139,11 +139,10 @@ public class RandomClassifier extends Classifier {
         ((AppUI)applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
         ((AppUI)applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
         ((AppUI)applicationTemplate.getUIComponent()).getClassificationConfigButton().setDisable(false);
-        ((AppUI)applicationTemplate.getUIComponent()).getRandomClusteringConfigButton().setDisable(false);
 //        ((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().remove(unfinished);
 //        finished.setText(applicationTemplate.manager.getPropertyValue(FINISHED_RUNNING_ALGORITHM.name()));
 //        ((AppUI)applicationTemplate.getUIComponent()).setAlgState(applicationTemplate.manager.getPropertyValue(FINISHED_RUNNING_ALGORITHM.name()));
-        ((AppUI)applicationTemplate.getUIComponent()).setFirstRandomClassifier(true);
+        ((AppUI)applicationTemplate.getUIComponent()).setFirstRun(true);
     //    ((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().add(finished);
     //    System.out.println("done");
         // if continue is false, each display button increases the i counter in the for loop until max iterations, then display button is disabled.

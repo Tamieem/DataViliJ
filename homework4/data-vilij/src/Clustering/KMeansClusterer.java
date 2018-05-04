@@ -1,11 +1,15 @@
 package Clustering;
 import algorithms.Clusterer;
 import classification.DataSet;
+import dataprocessors.TSDProcessor;
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import ui.AppUI;
+import vilij.templates.ApplicationTemplate;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,10 +23,14 @@ public class KMeansClusterer extends Clusterer {
 
     private DataSet dataset;
     private List<Point2D> centroids;
+    private TSDProcessor tsd;
+    private LineChart chart;
+    private ApplicationTemplate applicationTemplate;
 
     private final int           maxIterations;
     private final int           updateInterval;
     private final AtomicBoolean tocontinue;
+    XYChart.Series<Number, Number> series = new XYChart.Series<>();
 
 
     public KMeansClusterer(DataSet dataset, int maxIterations, int updateInterval, int numberOfClusters) {
@@ -39,7 +47,19 @@ public class KMeansClusterer extends Clusterer {
         this.maxIterations= maxIterations;
         this.updateInterval= updateInterval;
         this.tocontinue= new AtomicBoolean(tocontinue);
+        new KMeansClusterer(dataset,maxIterations,updateInterval,tocontinue, numberOfClusters, new TSDProcessor(), new LineChart<Number, Number>(new NumberAxis(), new NumberAxis()), new ApplicationTemplate());
+    }
 
+    public KMeansClusterer(DataSet dataset, int maxIterations, int updateInterval, boolean tocontinue, int numberOfClusters, TSDProcessor tsdProcessor, LineChart<Number, Number> numberNumberLineChart,
+                           ApplicationTemplate applicationTemplate) {
+        super(numberOfClusters);
+        this.dataset=dataset;
+        this.maxIterations= maxIterations;
+        this.updateInterval= updateInterval;
+        this.tocontinue= new AtomicBoolean(tocontinue);
+        tsd= tsdProcessor;
+        chart= numberNumberLineChart;
+        this.applicationTemplate= applicationTemplate;
     }
 
 
@@ -53,14 +73,45 @@ public class KMeansClusterer extends Clusterer {
     public boolean tocontinue() { return tocontinue.get(); }
 
     @Override
-    public synchronized void run() {
+    public void run() {
         initializeCentroids();
         int iteration = 0;
         while (iteration++ < maxIterations & tocontinue.get()) {
             assignLabels();
+            try {
+                Set<String> dataLabels = new HashSet<>(dataset.getLabels().values());
+                for (String dataLabel:dataLabels) {
+                    series.setName(dataLabel);
+                    dataset.getLabels()
+                            .entrySet()
+                            .stream()
+                            .filter(entry -> entry.getValue().equals(dataLabel))
+                            .forEach(entry -> {
+                                Point2D point = dataset.getLocations().get(entry.getKey());
+                                series.getData().add(new XYChart.Data<>(point.getX(), point.getY()));
+                            });
+                    if (iteration % updateInterval == 0 || iteration == maxIterations) {
+                        Platform.runLater(() -> chart.getData().clear());
+                        Thread.sleep(1000);
+                        if (!tocontinue()) {
+                            ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
+                            ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
+                            wait();
+                        }
+//                        series.getNode().setVisible(false);
+//                        series.getNode().setStyle("-fx-stroke: transparent");
+                        Platform.runLater(() -> chart.getData().add(series));
+                        Thread.sleep(1000);
+                     //   }
+                    }
+                }
+                }catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             recomputeCentroids();
         }
     }
+
     private void initializeCentroids() {
         Set<String>  chosen        = new HashSet<>();
         List<String> instanceNames = new ArrayList<>(dataset.getLabels().keySet());
