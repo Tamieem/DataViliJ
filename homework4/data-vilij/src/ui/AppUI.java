@@ -1,6 +1,7 @@
 package ui;
 
 import Clustering.KMeansClusterer;
+import Clustering.RandomClusterer;
 import Strategies.ClassificationContext;
 import Strategies.RandomClassificationStrategy;
 import actions.AppActions;
@@ -35,6 +36,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static settings.AppPropertyTypes.*;
@@ -71,6 +73,8 @@ public final class AppUI extends UITemplate {
     private String                       data;
     private Label label;
     private CheckBox cb1;
+    private List<Button> classifcationConfigButtons= new ArrayList<>();
+    private List<Button> clusteringConfigButtons = new ArrayList<>();
 
     private ChoiceBox cb = new ChoiceBox();
     private VBox vB = new VBox();
@@ -261,6 +265,7 @@ public final class AppUI extends UITemplate {
                 classRB.setSelected(false);
                 classRB.setToggleGroup(classificationGroup);
                 Button classConfig = new Button(applicationTemplate.manager.getPropertyValue(CONFIGURE.name()));
+                classifcationConfigButtons.add(classConfig);
                 classConfig.setOnAction(event -> handleRunConfiguration());
                 HBox classHBox = new HBox();
                 classHBox.getChildren().addAll(classRB, classConfig);
@@ -278,10 +283,11 @@ public final class AppUI extends UITemplate {
                 RadioButton clustRB = new RadioButton(line);
                 clustRB.setSelected(false);
                 clustRB.setToggleGroup(clusteringGroup);
-                Button classConfig = new Button(applicationTemplate.manager.getPropertyValue(CONFIGURE.name()));
-                classConfig.setOnAction(event -> handleRunConfiguration());
+                Button clustConfig = new Button(applicationTemplate.manager.getPropertyValue(CONFIGURE.name()));
+                clusteringConfigButtons.add(clustConfig);
+                clustConfig.setOnAction(event -> handleRunConfiguration());
                 HBox clustHBox = new HBox();
-                clustHBox.getChildren().addAll(clustRB, classConfig);
+                clustHBox.getChildren().addAll(clustRB, clustConfig);
                 ClusteringChoices.getChildren().add(clustHBox);
             }
         } catch (IOException e) {
@@ -289,6 +295,8 @@ public final class AppUI extends UITemplate {
         }
 
     }
+    private String selectedClassification;
+    private String selectedCluster;
 
     public void setWorkspaceActions(){
         textArea.textProperty().addListener(new ChangeListener<String>() {
@@ -320,28 +328,22 @@ public final class AppUI extends UITemplate {
         chart.setCursor(Cursor.CROSSHAIR);
         textArea.setPrefRowCount(10);
 
-//        classificationGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>(){
-//            public void changed(ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) {
-//
-//                if (classificationGroup.getSelectedToggle() != null) {
-//                    if(classificationGroup.getSelectedToggle().toString().equals("Random Classification"))
-//                        classificationContext.setClassificationStrategy(new RandomClassificationStrategy());
-//
-//                }
-//
-//            }
-//        });
-//        clusteringGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>(){
-//            public void changed(ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) {
-//
-//                if (clusteringGroup.getSelectedToggle() != null) {
-//                    if(clusteringGroup.getSelectedToggle().toString().equals("Random Classification"))
-//                        classificationContext.setClassificationStrategy(new RandomClassificationStrategy());
-//
-//                }
-//
-//            }
-//        });
+        classificationGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>(){
+            public void changed(ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) {
+
+                RadioButton chk = (RadioButton)new_toggle.getToggleGroup().getSelectedToggle(); // Cast object to radio button
+                selectedClassification = chk.getText();
+
+            }
+        });
+        clusteringGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>(){
+            public void changed(ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) {
+
+                RadioButton chk = (RadioButton)new_toggle.getToggleGroup().getSelectedToggle(); // Cast object to radio button
+                selectedCluster = chk.getText();
+
+            }
+        });
 
 
 
@@ -455,7 +457,9 @@ public final class AppUI extends UITemplate {
         // TODO: hw5
         scrnshotButton.setDisable(true);
         displayButton.setDisable(true);
-        ClassificationConfigButton.setDisable(true);
+        for(Button button: classifcationConfigButtons){
+            button.setDisable(true);
+        }
         int maxIt = runConfig.getMaxIterations();
         int interval = runConfig.getUpdateInterval();
         boolean continuous = runConfig.tocontinue();
@@ -475,9 +479,12 @@ public final class AppUI extends UITemplate {
                     System.out.print("");
                 }
             }
-            classifier = new RandomClassifier(dataSet, maxIt, interval, continuous, tsd, chart, applicationTemplate);
-            runAlg = new Thread(classifier);
-            runAlg.start();
+
+            if (selectedClassification.equals("Random Classification")) {
+                classifier = new RandomClassifier(dataSet, maxIt, interval, continuous, tsd, chart, applicationTemplate);
+                runAlg = new Thread(classifier);
+                runAlg.start();
+            }
         }
         else {
             synchronized (classifier) {
@@ -497,7 +504,9 @@ public final class AppUI extends UITemplate {
         // TODO: hw5
         scrnshotButton.setDisable(true);
         displayButton.setDisable(true);
-        ClassificationConfigButton.setDisable(true);
+        for(Button button: clusteringConfigButtons){
+            button.setDisable(true);
+        }
         int maxIt = runConfig.getMaxIterations();
         int interval = runConfig.getUpdateInterval();
         int numClusters = runConfig.getNumberOfClusters();
@@ -529,7 +538,10 @@ public final class AppUI extends UITemplate {
 //            } catch (ClassNotFoundException e) {
 //                e.printStackTrace();
 //            }
-            clusterer = new KMeansClusterer(dataSet, maxIt, interval, continuous, numClusters, tsd, chart, applicationTemplate);
+            if (selectedCluster.equals("Random Clustering"))
+                clusterer = new RandomClusterer(dataSet, maxIt, interval, continuous, numClusters, tsd, chart, applicationTemplate);
+            else if (selectedCluster.equals("KMeans Clustering"))
+                clusterer = new KMeansClusterer(dataSet, maxIt, interval, continuous, numClusters, tsd, chart, applicationTemplate);
             runAlg = new Thread(clusterer);
             runAlg.start();
         }
