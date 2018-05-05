@@ -133,7 +133,8 @@ public class RandomClusterer extends Clusterer {
         ((AppUI) applicationTemplate.getUIComponent()).setRunningState(false);
         ((AppUI)applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
         ((AppUI)applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
-        ((AppUI)applicationTemplate.getUIComponent()).getClassificationConfigButton().setDisable(false);
+        ((AppUI)applicationTemplate.getUIComponent()).setClassificationConfigButtons(
+                false);
         ((AppUI)applicationTemplate.getUIComponent()).setFirstRun(true);
   }
 

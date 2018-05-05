@@ -3,7 +3,6 @@ package ui;
 import Clustering.KMeansClusterer;
 import Clustering.RandomClusterer;
 import Strategies.ClassificationContext;
-import Strategies.RandomClassificationStrategy;
 import actions.AppActions;
 import algorithms.AlgorithmConfiguration;
 import algorithms.Classifier;
@@ -19,18 +18,18 @@ import javafx.scene.Cursor;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import vilij.components.Dialog;
 import vilij.components.ErrorDialog;
 import vilij.propertymanager.PropertyManager;
 import vilij.templates.ApplicationTemplate;
 import vilij.templates.UITemplate;
-import vilij.components.Dialog;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -436,9 +435,16 @@ public final class AppUI extends UITemplate {
     // ALL EXTRA METHODS NEEDED FOR DISPLAYING RANDOM CLASSIFICATION
     public void setAlgState(String string){ algState.setText(string); }
     public Label getAlgState(){ return algState; }
-    public Button getClassificationConfigButton(){ return ClassificationConfigButton; }
-    public Button getRandomClusteringConfigButton(){ return RandomClusteringConfig; }
-    public Button getKMeansClusteringConfigButton(){ return KMeansClusteringConfig; }
+    public void setClassificationConfigButtons(boolean val) {
+        for (Button button : classifcationConfigButtons) {
+            button.setDisable(val);
+        }
+    }
+    public void setClusteringConfigButtons(boolean val) {
+        for (Button button : clusteringConfigButtons) {
+            button.setDisable(val);
+        }
+    }
     private boolean firstRun = true;
     public void setFirstRun(boolean val){ firstRun =val; }
     private boolean running = false;
@@ -455,8 +461,6 @@ public final class AppUI extends UITemplate {
     public void handleClassificationDisplayRequest() {
         handleDisplayRequest();
         // TODO: hw5
-        scrnshotButton.setDisable(true);
-        displayButton.setDisable(true);
         for(Button button: classifcationConfigButtons){
             button.setDisable(true);
         }
@@ -502,18 +506,19 @@ public final class AppUI extends UITemplate {
         //ScatterChart and shit
         handleDisplayRequest();
         // TODO: hw5
-        scrnshotButton.setDisable(true);
-        displayButton.setDisable(true);
         for(Button button: clusteringConfigButtons){
             button.setDisable(true);
         }
         int maxIt = runConfig.getMaxIterations();
         int interval = runConfig.getUpdateInterval();
         int numClusters = runConfig.getNumberOfClusters();
-        if (numClusters < 2)
-            numClusters = 2;
-        else if (numClusters > 4)
-            numClusters = 4;
+//        if (numClusters < 2)
+//            numClusters = 2;
+//        else if (numClusters > 4)
+//            numClusters = 4;
+        for (XYChart.Series<Number, Number> series : chart.getData()) {
+            series.getNode().setStyle("fx-stroke: transparent");
+        }
         boolean continuous = runConfig.tocontinue();
         if (continuous ||firstRun) {
             if (((AppActions) applicationTemplate.getActionComponent()).getSavedFile() != null) {

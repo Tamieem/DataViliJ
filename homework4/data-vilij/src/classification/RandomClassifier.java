@@ -120,8 +120,6 @@ public class RandomClassifier extends Classifier {
                     if(!tocontinue()) {
                         ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
                         ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
-//                        ((AppUI) applicationTemplate.getUIComponent()).setAlgState(applicationTemplate.manager.getPropertyValue(UNFINISHED_RUNNING_ALGORITHM.name()));
-//                    ((AppUI) applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().add(unfinished);
                         wait();
                     }
                     if (i != maxIterations) {
@@ -138,14 +136,11 @@ public class RandomClassifier extends Classifier {
         ((AppUI) applicationTemplate.getUIComponent()).setRunningState(false);
         ((AppUI)applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
         ((AppUI)applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
-        ((AppUI)applicationTemplate.getUIComponent()).getClassificationConfigButton().setDisable(false);
+        ((AppUI)applicationTemplate.getUIComponent()).setClassificationConfigButtons(false);
 //        ((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().remove(unfinished);
 //        finished.setText(applicationTemplate.manager.getPropertyValue(FINISHED_RUNNING_ALGORITHM.name()));
 //        ((AppUI)applicationTemplate.getUIComponent()).setAlgState(applicationTemplate.manager.getPropertyValue(FINISHED_RUNNING_ALGORITHM.name()));
         ((AppUI)applicationTemplate.getUIComponent()).setFirstRun(true);
-    //    ((AppUI)applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().add(finished);
-    //    System.out.println("done");
-        // if continue is false, each display button increases the i counter in the for loop until max iterations, then display button is disabled.
     }
 
 

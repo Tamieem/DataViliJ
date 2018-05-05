@@ -49,6 +49,10 @@ public final class TSDProcessor {
             super(String.format("Repeated name at line " + num));
         }
     }
+    public TSDProcessor(Map<String, Point2D> points, Map<String, String> labels){
+        dataPoints=points;
+        dataLabels= labels;
+    }
 
     private Map<String, String> dataLabels;
     private Map<String, Point2D> dataPoints;
@@ -138,15 +142,19 @@ public final class TSDProcessor {
             series.getNode().setVisible(false);
         }
         // ToolTip
-        i = 0;
-        for (XYChart.Series<Number, Number> s : chart.getData()) {
-            for (XYChart.Data<Number, Number> d : s.getData()) {
-                Tooltip.install(d.getNode(), new Tooltip(names.get(i)));
-                d.getNode().setOnMouseEntered(event -> chart.setCursor(Cursor.CROSSHAIR));
-                d.getNode().setOnMouseExited(event -> chart.setCursor(Cursor.DEFAULT));
-                i++;
+        try {
+            i = 0;
+            for (XYChart.Series<Number, Number> s : chart.getData()) {
+                for (XYChart.Data<Number, Number> d : s.getData()) {
+                    Tooltip.install(d.getNode(), new Tooltip(names.get(i)));
+                    d.getNode().setOnMouseEntered(event -> chart.setCursor(Cursor.CROSSHAIR));
+                    d.getNode().setOnMouseExited(event -> chart.setCursor(Cursor.DEFAULT));
+                    i++;
 
+                }
             }
+        } catch (ArrayIndexOutOfBoundsException e){
+            System.out.print("");
         }
     }
    public XYChart.Series<Number, Number> equationSolver(Double xmin, Double xmax, List<Integer> list){
