@@ -369,6 +369,7 @@ public final class AppUI extends UITemplate {
                             displayButton.setDisable(true);
                         }
                         vB.getChildren().add(ClassificationChoices);
+                        setClassificationConfigButtons(false);
                         vB.getChildren().add(displayButtonBox);
                         displayButton.setOnAction(e -> handleClassificationDisplayRequest());
 
@@ -380,6 +381,7 @@ public final class AppUI extends UITemplate {
                         } else if (((String) options.get(oldValue.intValue())).equals(applicationTemplate.manager.getPropertyValue(SELECT_ALGORITHM_TYPE.name())))
                             runConfig = new AlgorithmConfiguration(applicationTemplate, (String) options.get(newValue.intValue()));
                         vB.getChildren().add(ClusteringChoices);
+                        setClusteringConfigButtons(false);
                         vB.getChildren().add(displayButtonBox);
                         displayButton.setOnAction(e -> handleClusteringDisplayRequest());
                     }
