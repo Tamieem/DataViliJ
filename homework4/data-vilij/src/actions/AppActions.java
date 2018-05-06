@@ -129,7 +129,7 @@ public final class AppActions implements ActionComponent {
                 LabelProcessor.getLabels().size() +
                 applicationTemplate.manager.getPropertyValue(LABEL_COUNT.name()) + NEWLINE);
         if(savedFile != null)
-            infoLabel.append(savedFile.getName());
+            infoLabel.append(savedFile.getAbsolutePath());
         else
             infoLabel.append(applicationTemplate.manager.getPropertyValue(NO_FILE_FOUND.name()));
         infoLabel.append(applicationTemplate.manager.getPropertyValue(LABEL_LIST.name()) + NEWLINE);
@@ -261,13 +261,13 @@ public final class AppActions implements ActionComponent {
         }
 
     }
-    private void savetoFile() throws IOException {
+    public void savetoFile() throws IOException {
         AppUI app = (AppUI) applicationTemplate.getUIComponent();
         TSDProcessor tsd= new TSDProcessor();
         FileChooser fC = new FileChooser();
         boolean hadError=false;
         try{
-            String data= app.getData();
+            String data= app.getTextAreaData();
             tsd.processString(data);
         }catch(Exception e){
             ErrorDialog errorDialogue= (ErrorDialog) applicationTemplate.getDialog(Dialog.DialogType.ERROR);
@@ -289,7 +289,7 @@ public final class AppActions implements ActionComponent {
         if(savedFile!=null)
             try {
                 FileWriter fW = new FileWriter(savedFile);
-                fW.write(app.getData());
+                fW.write(app.getTextAreaData());
                 fW.close();
                 save=true;
                 app.isSaved(true);

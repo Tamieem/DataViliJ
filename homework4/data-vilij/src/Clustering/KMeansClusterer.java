@@ -78,6 +78,7 @@ public class KMeansClusterer extends Clusterer {
     @Override
     public synchronized void run() {
         int iteration = 0;
+        chart.setAnimated(false);
         while (iteration <= maxIterations) {
             ((AppUI) applicationTemplate.getUIComponent()).setRunningState(true);
             ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(true);
@@ -95,13 +96,6 @@ public class KMeansClusterer extends Clusterer {
                         ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
                         wait();
                     }
-//                        series.getNode().setVisible(false);
-//                        series.getNode().setStyle("-fx-stroke: transparent");
-                    if(iteration != maxIterations) {
-                        Platform.runLater(() -> chart.getData().clear());
-                        Thread.sleep(1000);
-                    }
-                    //   }
                 }
                 iteration++;
             }catch ( InterruptedException | ArrayIndexOutOfBoundsException e) {
@@ -109,6 +103,7 @@ public class KMeansClusterer extends Clusterer {
             }
             recomputeCentroids();
         }
+        chart.setAnimated(true);
         ((AppUI) applicationTemplate.getUIComponent()).setRunningState(false);
         ((AppUI)applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
         ((AppUI)applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);

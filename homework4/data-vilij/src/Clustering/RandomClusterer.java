@@ -84,6 +84,7 @@ public class RandomClusterer extends Clusterer {
     @Override
     public synchronized void run() {
         int iteration = 0;
+        chart.setAnimated(false);
         while (iteration <= maxIterations) {
             ((AppUI) applicationTemplate.getUIComponent()).setRunningState(true);
             ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(true);
@@ -101,13 +102,6 @@ public class RandomClusterer extends Clusterer {
                         ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
                         wait();
                     }
-//                        series.getNode().setVisible(false);
-//                        series.getNode().setStyle("-fx-stroke: transparent");
-                    if(iteration != maxIterations) {
-                        Platform.runLater(() -> chart.getData().clear());
-                        Thread.sleep(1000);
-                    }
-                    //   }
                 }
                 iteration++;
             }catch ( InterruptedException | ArrayIndexOutOfBoundsException e) {
@@ -115,6 +109,7 @@ public class RandomClusterer extends Clusterer {
             }
             recomputeCentroids();
         }
+        chart.setAnimated(true);
         ((AppUI) applicationTemplate.getUIComponent()).setRunningState(false);
         ((AppUI)applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
         ((AppUI)applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
@@ -179,8 +174,5 @@ public class RandomClusterer extends Clusterer {
         });
     }
 
-    private static double computeDistance(Point2D p, Point2D q) {
-        return Math.sqrt(Math.pow(p.getX() - q.getX(), 2) + Math.pow(p.getY() - q.getY(), 2));
-    }
 
 }

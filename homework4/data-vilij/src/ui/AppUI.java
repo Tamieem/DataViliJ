@@ -290,7 +290,7 @@ public final class AppUI extends UITemplate {
                 ClusteringChoices.getChildren().add(clustHBox);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.print("");
         }
 
     }
@@ -561,7 +561,7 @@ public final class AppUI extends UITemplate {
     public void isSaved(boolean val){
         scrnshotButton.setDisable(val);
     }
-    public String getData(){
+    public String getTextAreaData(){
         data=textArea.getText();
         return this.data;
     }
