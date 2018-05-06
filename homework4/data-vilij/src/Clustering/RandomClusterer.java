@@ -6,14 +6,14 @@ import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import ui.AppUI;
 import vilij.templates.ApplicationTemplate;
 
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class RandomClusterer extends Clusterer {
 
@@ -29,6 +29,7 @@ public class RandomClusterer extends Clusterer {
     private  int           maxIterations;
     private  int           updateInterval;
     private  AtomicBoolean tocontinue;
+    private boolean continuous;
     private TSDProcessor tsd;
     private ApplicationTemplate applicationTemplate;
     private LineChart chart;
@@ -47,6 +48,7 @@ public class RandomClusterer extends Clusterer {
         this.maxIterations= maxIterations;
         this.updateInterval= updateInterval;
         this.tocontinue= new AtomicBoolean(tocontinue);
+        continuous= tocontinue;
         new RandomClusterer(dataset, maxIterations, updateInterval, tocontinue, numberOfClusters, new TSDProcessor(),
                 new LineChart<Number, Number>(new NumberAxis(), new NumberAxis()), new ApplicationTemplate());
 
@@ -57,6 +59,7 @@ public class RandomClusterer extends Clusterer {
         this.maxIterations=maxIterations;
         this.updateInterval=updateInterval;
         this.tocontinue=new AtomicBoolean(tocontinue);
+        continuous= tocontinue;
         this.tsd=tsd;
         this.chart= chart;
         this.applicationTemplate=applicationTemplate;
@@ -80,75 +83,104 @@ public class RandomClusterer extends Clusterer {
 
     @Override
     public synchronized void run() {
-        for (int i = 1; i <= maxIterations; i++) {
+        int iteration = 0;
+        while (iteration <= maxIterations) {
             ((AppUI) applicationTemplate.getUIComponent()).setRunningState(true);
             ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(true);
             ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(true);
-
-            int xCoefficient =  new Long(-1 * Math.round((2 * RAND.nextDouble() - 1) * 10)).intValue();
-            int yCoefficient = 10;
-            int constant     = RAND.nextInt(11);
-            // this is the real output of the classifier
-            output = Arrays.asList(xCoefficient, yCoefficient, constant);
-            outputs.add(output);
-
-            if (i % updateInterval == 0) {
-                System.out.printf("Iteration number %d: ", i); //
-                flush();
-            }
-            if (i > maxIterations * .6 && RAND.nextDouble() < 0.05) {
-                System.out.printf("Iteration number %d: ", i);
-                flush();
-                break;
-            }
-
+            initializeCentroids();
+            assignLabels();
             try {
                 ((AppUI) applicationTemplate.getUIComponent()).setFirstRun(false);
-                Collections.sort(dataset.getxComponent());
-                Double min = dataset.getxComponent().get(0);
-                Double max = dataset.getxComponent().get(dataset.getxComponent().size() - 1);
-                XYChart.Series series = tsd.equationSolver(min, max, output);
-                series.getNode().setVisible(false);
-                if (i % updateInterval == 0 || i==maxIterations) {
-                    Platform.runLater(() -> chart.getData().add(series));
+                tsd = new TSDProcessor(dataset.getLocations(), dataset.getLabels());
+                if (iteration % updateInterval == 0 || iteration == maxIterations) {
+                    Platform.runLater(() -> tsd.toChartData(chart));
                     Thread.sleep(1000);
-                    if(!tocontinue()) {
+                    if (!continuous) {
                         ((AppUI) applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
                         ((AppUI) applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
-//                        ((AppUI) applicationTemplate.getUIComponent()).setAlgState(applicationTemplate.manager.getPropertyValue(UNFINISHED_RUNNING_ALGORITHM.name()));
-//                    ((AppUI) applicationTemplate.getUIComponent()).getDisplayButtonBox().getChildren().add(unfinished);
                         wait();
                     }
-                    if (i != maxIterations) {
-                        Platform.runLater(() -> chart.getData().remove(series));
+//                        series.getNode().setVisible(false);
+//                        series.getNode().setStyle("-fx-stroke: transparent");
+                    if(iteration != maxIterations) {
+                        Platform.runLater(() -> chart.getData().clear());
                         Thread.sleep(1000);
                     }
+                    //   }
                 }
-
-            } catch (InterruptedException e) {
+                iteration++;
+            }catch ( InterruptedException | ArrayIndexOutOfBoundsException e) {
                 System.out.print("");
             }
-
+            recomputeCentroids();
         }
         ((AppUI) applicationTemplate.getUIComponent()).setRunningState(false);
         ((AppUI)applicationTemplate.getUIComponent()).getScreenshotButton().setDisable(false);
         ((AppUI)applicationTemplate.getUIComponent()).getDisplayButton().setDisable(false);
-        ((AppUI)applicationTemplate.getUIComponent()).setClassificationConfigButtons(
-                false);
-        ((AppUI)applicationTemplate.getUIComponent()).setFirstRun(true);
-  }
-
-
-
-    // for internal viewing only
-    protected void flush() {
-        System.out.printf("%d\t%d\t%d%n", output.get(0), output.get(1), output.get(2));
+        ((AppUI)applicationTemplate.getUIComponent()).setClusteringConfigButtons(false);
+        ((AppUI) applicationTemplate.getUIComponent()).setFirstRun(true);
     }
 
-    /** A placeholder main method to just make sure this code runs smoothly */
-    public static void main(String... args) throws IOException {
-        DataSet          dataset    = DataSet.fromTSDFile(Paths.get("/path/to/some-data.tsd"));
-        RandomClusterer clusterer = new RandomClusterer(dataset, 100, 5, true, 3);
-        clusterer.run(); // no multithreading yet
+    private void initializeCentroids() {
+        Set<String> chosen = new HashSet<>();
+        List<String> instanceNames = new ArrayList<>(dataset.getLabels().keySet());
+        Random r = new Random();
+        try {
+            while (chosen.size() < numberOfClusters) {
+                int i = r.nextInt(instanceNames.size());
+                while (chosen.contains(instanceNames.get(i)))
+                    ++i;
+                chosen.add(instanceNames.get(i));
+            }
+            centroids = chosen.stream().map(name -> dataset.getLocations().get(name)).collect(Collectors.toList());
+            tocontinue.set(true);
+        } catch(IndexOutOfBoundsException e){
+            System.out.print("");
+        }
     }
+
+    private void assignLabels() {
+
+        Random rand = new Random();
+        dataset.getLocations().forEach((instanceName, location) -> {
+//            double minDistance      = Double.MAX_VALUE;
+//            int    minDistanceIndex = 0;
+            int randomNum = rand.nextInt(((numberOfClusters-1) - 0) + 1) + 0;
+//            for (int i = 0; i < centroids.size(); i++) {
+//                double distance = computeDistance(centroids.get(i), location);
+//                if (distance < minDistance) {
+//                    minDistance = distance;
+//                    minDistanceIndex = i;
+//                }
+//            }
+            dataset.getLabels().put(instanceName, Integer.toString(randomNum));
+        });
+    }
+
+    private void recomputeCentroids() {
+        tocontinue.set(false);
+        IntStream.range(0, numberOfClusters).forEach(i -> {
+            AtomicInteger clusterSize = new AtomicInteger();
+            Point2D sum = dataset.getLabels()
+                    .entrySet()
+                    .stream()
+                    .filter(entry -> i == Integer.parseInt(entry.getValue()))
+                    .map(entry -> dataset.getLocations().get(entry.getKey()))
+                    .reduce(new Point2D(0, 0), (p, q) -> {
+                        clusterSize.incrementAndGet();
+                        return new Point2D(p.getX() + q.getX(), p.getY() + q.getY());
+                    });
+            Point2D newCentroid = new Point2D(sum.getX() / clusterSize.get(), sum.getY() / clusterSize.get());
+            if (!newCentroid.equals(centroids.get(i))) {
+                centroids.set(i, newCentroid);
+                tocontinue.set(true);
+            }
+        });
+    }
+
+    private static double computeDistance(Point2D p, Point2D q) {
+        return Math.sqrt(Math.pow(p.getX() - q.getX(), 2) + Math.pow(p.getY() - q.getY(), 2));
+    }
+
 }
