@@ -6,7 +6,6 @@ import javafx.application.Platform;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Label;
 import ui.AppUI;
 import vilij.templates.ApplicationTemplate;
 
@@ -32,9 +31,6 @@ public class RandomClassifier extends Classifier {
     private LineChart<Number, Number> chart;
     private List<List<Integer>> outputs = new ArrayList<List<Integer>>();
     private ApplicationTemplate applicationTemplate;
-
-    private Label unfinished = new Label();
-    private Label finished = new Label();
 
 
     // currently, this value does not change after instantiation

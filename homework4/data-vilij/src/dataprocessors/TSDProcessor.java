@@ -28,6 +28,26 @@ import static settings.AppPropertyTypes.ERROR_TITLE;
 public final class TSDProcessor {
 
     private ApplicationTemplate applicationTemplate;
+
+    public static class WrongPointException extends  Exception{
+        public WrongPointException(String message){
+            super(message);
+        }
+    }
+
+
+    public static class TwoPointsDoesntExist extends  Exception{
+        public TwoPointsDoesntExist(String message){
+            super(message);
+        }
+    }
+
+    public static class ThreeTabsDoesntExist extends  Exception{
+        public ThreeTabsDoesntExist(String message){
+            super(message);
+        }
+    }
+
     public static class InvalidDataNameException extends Exception {
 
         private static final String NAME_ERROR_MSG = "All data instance names must start with the @ character.";
@@ -115,6 +135,7 @@ public final class TSDProcessor {
                 });
 
     }
+
 
     /**
      * Exports the data to the specified 2-D chart.

@@ -19,6 +19,8 @@ import vilij.templates.UITemplate;
 import javax.imageio.ImageIO;
 import java.io.*;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 import static settings.AppPropertyTypes.*;
 
@@ -80,6 +82,29 @@ public final class AppActions implements ActionComponent {
             savedFile = null;
         }
     }
+
+    public static void stringCheck(String line) throws TSDProcessor.ThreeTabsDoesntExist, TSDProcessor.TwoPointsDoesntExist, TSDProcessor.WrongPointException {
+        List<String> lines = Arrays.asList(line.split("\t"));
+        if (lines.size() != 3) {
+            throw new TSDProcessor.ThreeTabsDoesntExist("Three tabs does not exist");
+        }
+        String twoPoints = lines.get(2);
+        List<String> twoPointsList = Arrays.asList(twoPoints.split(","));
+        if (twoPointsList.size() != 2){
+            throw new TSDProcessor.TwoPointsDoesntExist("Two points does not exist");
+        }
+
+        for (String listPoint: twoPointsList){
+            try {
+                Double.parseDouble(listPoint);
+            } catch (NumberFormatException ex){
+                throw new TSDProcessor.WrongPointException("Your points are not numbers");
+            }
+        }
+    }
+
+
+
     public void handleValidationRequest(String string){
         AppUI app = (AppUI) applicationTemplate.getUIComponent();
         LabelProcessor = new TSDProcessor();

@@ -12,7 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import vilij.templates.ApplicationTemplate;
 
@@ -152,6 +151,44 @@ public class AlgorithmConfiguration extends Stage{
     public void run(Stage owner) {
         setWorkspaceActions();
         init(owner);
+
+    }
+    public static class IllegalMaxIterationException extends  Exception{
+        public IllegalMaxIterationException(String message){
+            super(message);
+        }
+    }
+    public static class IllegalUpdateIntervalException extends Exception{
+        public IllegalUpdateIntervalException(String message){
+            super(message);
+        }
+    }
+    public static boolean testClusterConfigurations(String maxIterations, String numberOfClusters, String updateInterval) throws IllegalMaxIterationException, IllegalUpdateIntervalException {
+        if(Integer.parseInt(maxIterations)<0)
+            throw new IllegalMaxIterationException("Invalid Max Iteration");
+        if(Integer.parseInt(updateInterval)<0 || Integer.parseInt(updateInterval)>Integer.parseInt(maxIterations))
+            throw new IllegalUpdateIntervalException("Invalid Update Interval");
+        if(maxIterations.equals("") ||updateInterval.equals("") || numberOfClusters.equals(""))
+            throw new NullPointerException("Missing Number");
+        if(maxIterations.matches(".*[a-zA-Z]+.*") ||updateInterval.matches(".*[a-zA-Z]+.*") || numberOfClusters.matches(".*[a-zA-Z]+.*") )
+            throw new NumberFormatException("Configuration contains letters.");
+        return true;
+
+
+    }
+
+    public static boolean testClassificationConfigurations(String maxIterations, String updateInterval) throws IllegalMaxIterationException, IllegalUpdateIntervalException {
+        if(Integer.parseInt(maxIterations)<0)
+            throw new IllegalMaxIterationException("Invalid Max Iteration");
+        if(Integer.parseInt(updateInterval)<0 || Integer.parseInt(updateInterval)>Integer.parseInt(maxIterations))
+            throw new IllegalUpdateIntervalException("Invalid Update Interval");
+        if(maxIterations.equals("") ||updateInterval.equals(""))
+            throw new NullPointerException("Missing Number");
+        if(maxIterations.matches(".*[a-zA-Z]+.*") ||updateInterval.matches(".*[a-zA-Z]+.*"))
+            throw new NumberFormatException("Configuration contains letters.");
+        else
+            return true;
+
 
     }
 
