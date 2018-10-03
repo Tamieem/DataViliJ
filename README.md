@@ -1,5 +1,6 @@
 # DataViliJ
 Data Visualization Library in Java 
+
 -A desktop application that allows users to select an algorithm (from a set of standard AI algorithms) and dynamically shows the user what changes and how.
 
 This was the first project I created alongside using Git. 
